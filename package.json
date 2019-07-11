@@ -1,0 +1,29 @@
+{
+  "name": "knight-tour",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sergeypogorelov/knight-tour.git"
+  },
+  "keywords": [
+    "SCSS",
+    "TypeScript",
+    "WebWorkers"
+  ],
+  "author": "Sergey Pogorelov <sergey.pogorelov.93@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sergeypogorelov/knight-tour/issues"
+  },
+  "homepage": "https://github.com/sergeypogorelov/knight-tour#readme",
+  "devDependencies": {
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.35.3",
+    "webpack-cli": "^3.3.5"
+  }
+}
