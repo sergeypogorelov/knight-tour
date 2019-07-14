@@ -5,7 +5,7 @@ const webpackConfigCommon = require('./webpack.config.common');
 
 module.exports = webpackMerge(webpackConfigCommon, {
     mode: 'development',
-    devtool: 'cheap-eval-source-map',
+    devtool: 'inline-source-map',
     devServer: {
         contentBase: path.resolve(__dirname, '../dist'),
         port: 4200
@@ -38,6 +38,18 @@ module.exports = webpackMerge(webpackConfigCommon, {
                     {
                         loader: 'sass-loader'
                     }
+                ],
+                exclude: /node_modules/
+            },
+            {
+                test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[path][name].[ext]'
+                        },
+                    },
                 ]
             }
         ]
