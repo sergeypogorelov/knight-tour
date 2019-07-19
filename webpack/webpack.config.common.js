@@ -16,6 +16,11 @@ module.exports = webpackMerge({}, {
                 test: /\.ts$/,
                 use: 'ts-loader',
                 exclude: /node_modules/
+            },
+            {
+                test: /\.dot$/,
+                use: 'raw-loader',
+                exclude: /node_modules/
             }
         ]
     },
