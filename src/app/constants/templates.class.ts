@@ -1,5 +1,5 @@
 const testModule = require('../templates/test.dot');
 
-export class TemplatesContent {
+export class Templates {
     static readonly test: string = testModule.default;
 }

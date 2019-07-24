@@ -25,7 +25,7 @@ module.exports = webpackMerge({}, {
         ]
     },
     resolve: {
-        extensions: ['.ts', '.js']
+        extensions: ['.js', '.ts']
     },
     plugins: [
         new HtmlWebpackPlugin({
