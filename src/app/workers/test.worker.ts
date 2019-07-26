@@ -1,12 +1,8 @@
-interface Test {
-    prop: string;
-}
+import { Test } from '../interfaces/messages/test.interface';
 
-const item: Test = { prop: 'qq' };
-
-console.log('hello from a webworker', item);
+const workerMessage: Test = { message: 'qq' };
 
 addEventListener('message', (message) => {
-    console.log('in webworker', message);
-    postMessage('this is the response ' + message.data);
+    console.log('worker thread: ', message);
+    postMessage(workerMessage);
 });
