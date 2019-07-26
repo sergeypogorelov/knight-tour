@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
 const webpackMerge = require('webpack-merge');
 
 const webpackConfigCommon = require('./webpack.config.common');
@@ -57,7 +58,8 @@ module.exports = webpackMerge(webpackConfigCommon, {
                 cache: true,
                 parallel: true,
                 sourceMap: true
-            })
+            }),
+            new OptimizeCssAssetsWebpackPlugin()
         ]
     },
     plugins: [

@@ -1,7 +1,7 @@
 import { Templates } from "./constants/templates.class";
 import { DotHelper } from "./helpers/dot.helper";
 
-import * as workerPath from "file-loader?name=[name].js!./workers/test.worker";
+import * as workerPath from "file-loader?name=[name].[hash].js!./workers/test.worker";
 
 /**
  * represents the application
