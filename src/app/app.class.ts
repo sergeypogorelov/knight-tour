@@ -1,5 +1,5 @@
 import { Templates } from "./constants/templates.class";
-import { DotHelper } from "./helpers/dot.class";
+import { DotHelper } from "./helpers/dot-helper.class";
 
 import { Test } from './interfaces/messages/test.interface';
 

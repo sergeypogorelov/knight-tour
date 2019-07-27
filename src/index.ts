@@ -1,4 +1,4 @@
-/// import globals styles
+/// import global styles
 import './index.scss';
 
 /// import the application class
