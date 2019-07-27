@@ -1,8 +1,10 @@
 import { Test } from '../interfaces/messages/test.interface';
 
+const ctx: Worker = self as any;
+
 const workerMessage: Test = { message: 'qq' };
 
-addEventListener('message', (message) => {
+ctx.addEventListener('message', (message) => {
     console.log('worker thread: ', message);
-    postMessage(workerMessage);
+    ctx.postMessage(workerMessage);
 });

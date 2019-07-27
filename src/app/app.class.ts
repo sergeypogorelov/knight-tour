@@ -1,9 +1,9 @@
 import { Templates } from "./constants/templates.class";
-import { DotHelper } from "./helpers/dot.helper";
+import { DotHelper } from "./helpers/dot.class";
 
 import { Test } from './interfaces/messages/test.interface';
 
-import * as workerPath from "file-loader?name=[name].[hash].js!./workers/test.worker";
+import Worker from 'worker-loader!./workers/test.worker';
 
 /**
  * represents the application
@@ -30,11 +30,11 @@ export class App {
 
         console.log(htmlString);
 
-        const worker = new Worker(workerPath);
-
+        const worker = new Worker();
         worker.addEventListener('message', message => {
             console.log('main thread: ', message);
         });
+
         const message: Test = { message: 'hello' };
         worker.postMessage(message);
     }
