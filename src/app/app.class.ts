@@ -1,9 +1,8 @@
-import { Templates } from "./constants/templates.class";
-import { DotHelper } from "./helpers/dot-helper.class";
+import BruteForceWorker from 'worker-loader!./workers/brute-force';
 
-import { Test } from './interfaces/messages/test.interface';
-
-import Worker from 'worker-loader!./workers/test.worker';
+import { INotificationMessage } from './interfaces/messages/notifications/notification-message.interface';
+import { IStartSearchMessage } from './interfaces/messages/actions/start-search-message.interface';
+import { Actions } from './enums/actions.enum';
 
 /**
  * represents the application
@@ -24,23 +23,25 @@ export class App {
      * runs the app
      */
     run() {
-        const testTemplateMarkup = Templates.test;
-        const testTemplate = DotHelper.template(testTemplateMarkup);
-        const htmlString = testTemplate({ name: 'Vasya' });
-
-        console.log(htmlString);
-
-        const worker = new Worker();
-        worker.addEventListener('message', message => {
-            console.log('main thread: ', message);
+        const worker = new BruteForceWorker();
+        worker.addEventListener('message', ev => {
+            const notificationMessage = ev.data as INotificationMessage;
+            console.log(notificationMessage);
         });
-
-        const message: Test = { message: 'hello' };
-        worker.postMessage(message);
+        
+        const actionMessage: IStartSearchMessage = {
+            action: Actions.SearchStart,
+            board: {
+                cells: []
+            }
+        };
+        worker.postMessage(actionMessage);
     }
 
     /**
      * the app instance
      */
     private static _instance: App = null;
+
+    private constructor() { }
 }
