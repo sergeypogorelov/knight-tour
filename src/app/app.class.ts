@@ -3,6 +3,7 @@ import BruteForceWorker from 'worker-loader!./workers/brute-force';
 import { INotificationMessage } from './interfaces/messages/notifications/notification-message.interface';
 import { IStartSearchMessage } from './interfaces/messages/actions/start-search-message.interface';
 import { Actions } from './enums/actions.enum';
+import { Board } from './entities/board.class';
 
 /**
  * represents the application
@@ -31,9 +32,7 @@ export class App {
         
         const actionMessage: IStartSearchMessage = {
             action: Actions.SearchStart,
-            board: {
-                cells: []
-            }
+            board: Board.createFromCells(Board.generateUntouchedCells()).asJSON()
         };
         worker.postMessage(actionMessage);
     }
