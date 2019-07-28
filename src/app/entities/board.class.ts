@@ -1,5 +1,11 @@
 import { IBoard } from "../interfaces/board.interface";
+import { IBoardCoordinate } from "../interfaces/board-coordinate.interface";
+import { IMatrixCoordinate } from "../interfaces/matrix-coordinate.interface";
+import { BoardLetters } from "../enums/board-letters.enum";
 
+/**
+ * a chess board
+ */
 export class Board implements IBoard {
     /**
      * cell value if the knight hasn't moved yet
@@ -98,6 +104,34 @@ export class Board implements IBoard {
      */
     constructor() {
         this._cells = [];
+    }
+
+    setStartingPosition(coordinate: IBoardCoordinate) {
+        if (!coordinate)
+            throw new Error('Coordinate is not specified.');
+
+        const matrixCoordinate = this.parseCoordinateFromBoardToMatrix(coordinate);
+        this.cells[matrixCoordinate.column][matrixCoordinate.row] = Board.startingCellValue;
+    }
+
+    parseCoordinateFromMatrixToBoard(coordinate: IMatrixCoordinate): IBoardCoordinate {
+        if (!coordinate)
+            throw new Error('Coordinate is not specified.');
+        
+        return {
+            letter: coordinate.row + 1,
+            number: coordinate.column - this.cells.length
+        };
+    }
+
+    parseCoordinateFromBoardToMatrix(coordinate: IBoardCoordinate): IMatrixCoordinate {
+        if (!coordinate)
+            throw new Error('Coordinate is not specified.');
+
+        return {
+            row: coordinate.letter - 1,
+            column: this.cells.length - coordinate.number
+        };
     }
 
     /**

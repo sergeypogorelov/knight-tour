@@ -4,6 +4,7 @@ import { INotificationMessage } from './interfaces/messages/notifications/notifi
 import { IStartSearchMessage } from './interfaces/messages/actions/start-search-message.interface';
 import { Actions } from './enums/actions.enum';
 import { Board } from './entities/board.class';
+import { BoardLetters } from './enums/board-letters.enum';
 
 /**
  * represents the application
@@ -30,9 +31,12 @@ export class App {
             console.log(notificationMessage);
         });
         
+        const board = Board.createFromCells(Board.generateUntouchedCells());
+        board.setStartingPosition({ letter: BoardLetters.A, number: 3 });
+
         const actionMessage: IStartSearchMessage = {
             action: Actions.SearchStart,
-            board: Board.createFromCells(Board.generateUntouchedCells()).asJSON()
+            board: board.asJSON()
         };
         worker.postMessage(actionMessage);
     }
