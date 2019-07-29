@@ -104,6 +104,20 @@ export class Board implements IBoard {
     }
 
     /**
+     * count of columns on the board
+     */
+    get countOfColumns(): number {
+        return this.cells[0].length;
+    }
+
+    /**
+     * max count of rows on the board
+     */
+    get countOfRows(): number {
+        return this.cells.length;
+    }
+
+    /**
      * creates an empty chess board
      */
     constructor() {
@@ -120,7 +134,7 @@ export class Board implements IBoard {
             throw new Error('Coordinate is not specified.');
 
         const matrixCoordinate = this.castCoordinateFromBoardToMatrix(coordinate);
-        this.cells[matrixCoordinate.column][matrixCoordinate.row] = Board.startingCellValue;
+        this.cells[matrixCoordinate.row][matrixCoordinate.column] = Board.startingCellValue;
     }
 
     /**
@@ -133,8 +147,8 @@ export class Board implements IBoard {
             throw new Error('Coordinate is not specified.');
         
         return {
-            letter: coordinate.row + 1,
-            number: coordinate.column - this.cells.length
+            letter: coordinate.column + 1,
+            number: this.cells.length - coordinate.row
         };
     }
 
@@ -148,8 +162,8 @@ export class Board implements IBoard {
             throw new Error('Coordinate is not specified.');
 
         return {
-            row: coordinate.letter - 1,
-            column: this.cells.length - coordinate.number
+            row: coordinate.number - this.cells.length,
+            column: coordinate.letter - 1
         };
     }
 

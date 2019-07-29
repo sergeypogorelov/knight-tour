@@ -5,6 +5,7 @@ import { IStartSearchMessage } from './common/interfaces/messages/actions/start-
 import { Actions } from './common/enums/actions.enum';
 import { Board } from './common/entities/board.class';
 import { BoardLetters } from './common/enums/board-letters.enum';
+import { Knight } from './common/entities/knight.class';
 
 /**
  * represents the application
@@ -33,6 +34,9 @@ export class App {
         
         const board = Board.createFromCells(Board.generateUntouchedCells());
         board.setStartingPosition({ letter: BoardLetters.A, number: 3 });
+
+        const knight = new Knight(board);
+        console.log(knight.getAllAvailableMoves({ row: 0, column: 0 }));
 
         const actionMessage: IStartSearchMessage = {
             action: Actions.SearchStart,
