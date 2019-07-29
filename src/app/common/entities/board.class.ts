@@ -22,7 +22,7 @@ export class Board implements IBoard {
      * 
      * @param cells cells for a chess board
      */
-    static createFromCells(cells: Array<Array<number>>): Board {
+    static createFromCells(cells: number[][]): Board {
         if (!cells)
             throw new Error('Cells are not specified.');
 
@@ -51,9 +51,13 @@ export class Board implements IBoard {
      * @param width home many letters on the board (ex. A, B, C)
      * @param height how many numbers on the board (ex. 1, 2, 3)
      */
-    static generateUntouchedCells(width = 3, height = 3): Array<Array<number>> {
+    static generateUntouchedCells(width = 3, height = 3): number[][] {
         if (width < 3)
             throw new Error('The board width cannot be less than 3.');
+
+        const maxWidth = Object.keys(BoardLetters).length / 2;
+        if (width > maxWidth)
+            throw new Error(`The board width cannot be more than ${maxWidth}.`);
         
         if (height < 3)
             throw new Error('The board height cannot be less than 3.');
@@ -78,11 +82,11 @@ export class Board implements IBoard {
      * 
      * @param cells cells to clone
      */
-    static cloneCells(cells: Array<Array<number>>): Array<Array<number>> {
+    static cloneCells(cells: number[][]): number[][] {
         if (!cells)
             throw new Error('Cells are not specified.');
 
-        const result: Array<Array<number>> = [];
+        const result: number[][] = [];
 
         cells.forEach(row => {
             result.push(row.slice());
@@ -95,7 +99,7 @@ export class Board implements IBoard {
      * chess board cells
      * number says the move number in the knight tour
      */
-    get cells(): Array<Array<number>> {
+    get cells(): number[][] {
         return this._cells;
     }
 
@@ -153,13 +157,14 @@ export class Board implements IBoard {
      * casts to a plain object and returns it
      */
     asJSON(): IBoard {
+        const cells = Board.cloneCells(this.cells);
         return {
-            cells: Board.cloneCells(this.cells)
+            cells
         };
     }
 
     /**
      * chess board cells
      */
-    private _cells: Array<Array<number>>;
+    private _cells: number[][];
 }
