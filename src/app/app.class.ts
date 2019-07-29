@@ -1,10 +1,10 @@
 import BruteForceWorker from 'worker-loader!./workers/brute-force';
 
-import { INotificationMessage } from './interfaces/messages/notifications/notification-message.interface';
-import { IStartSearchMessage } from './interfaces/messages/actions/start-search-message.interface';
-import { Actions } from './enums/actions.enum';
-import { Board } from './entities/board.class';
-import { BoardLetters } from './enums/board-letters.enum';
+import { INotificationMessage } from './common/interfaces/messages/notifications/notification-message.interface';
+import { IStartSearchMessage } from './common/interfaces/messages/actions/start-search-message.interface';
+import { Actions } from './common/enums/actions.enum';
+import { Board } from './common/entities/board.class';
+import { BoardLetters } from './common/enums/board-letters.enum';
 
 /**
  * represents the application

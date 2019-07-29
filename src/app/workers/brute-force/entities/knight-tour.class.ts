@@ -1,4 +1,4 @@
-import { Board } from "../../../entities/board.class";
+import { Board } from "../../../common/entities/board.class";
 
 export class KnightTour {
 
