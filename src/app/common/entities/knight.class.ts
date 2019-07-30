@@ -1,5 +1,6 @@
 import { Board } from "./board.class";
 import { IMatrixCoordinate } from "../interfaces/matrix-coordinate.interface";
+import { IBoardCoordinate } from "../interfaces/board-coordinate.interface";
 
 /**
  * a chess knight
@@ -34,8 +35,8 @@ export class Knight {
         if (!coordinate)
             throw new Error('Coordinate is not specified.');
 
-        return  coordinate.column > 0 &&
-                coordinate.row > 0 &&
+        return  coordinate.column >= 0 &&
+                coordinate.row >= 0 &&
                 coordinate.column < this.board.countOfColumns &&
                 coordinate.row < this.board.countOfRows &&
                 this.board.cells[coordinate.row][coordinate.column] === Board.untouchedCellValue;
@@ -46,13 +47,56 @@ export class Knight {
      * 
      * @param currentCoordinate current coordinate of the knight
      */
-    getAllAvailableMoves(currentCoordinate: IMatrixCoordinate): IMatrixCoordinate[] {
+    findAllAvailableMoves(currentCoordinate: IMatrixCoordinate): IMatrixCoordinate[] {
         if (!currentCoordinate)
             throw new Error('Current coordinate is not specified.');
 
         return this._availableMovesCheckers
             .map(checker => checker(currentCoordinate))
             .filter(possibleMoveCoordinate => possibleMoveCoordinate !== null);
+    }
+    
+    /**
+     * searchs for the last move on the board and returns its coordinate on success
+     * returns NULL otherwise
+     */
+    findLastMove(): IMatrixCoordinate {
+        let result: IMatrixCoordinate = null;
+
+        let row = -1;
+        let column = -1;
+        let cellValue = Board.untouchedCellValue;
+
+        for (let i = 0; i < this.board.countOfRows; i++) {
+            for (let j = 0; j < this.board.countOfColumns; j++) {
+
+                let currentCellValue = this.board.cells[i][j];
+                if (currentCellValue > cellValue) {
+                    row = i;
+                    column = j;
+                    cellValue = currentCellValue;
+                }
+            }
+        }
+
+        if (cellValue !== Board.untouchedCellValue && row !== -1 && column !== -1) {
+            result = { row, column };
+        }
+
+        return result;
+    }
+
+    /**
+     * sets starting position
+     * 
+     * @param coordinate coordinate to set starting position
+     */
+    setStartingPosition(coordinate: IBoardCoordinate) {
+        if (!coordinate)
+            throw new Error('Coordinate is not specified.');
+
+        const matrixCoordinate = this.board.castCoordinateFromBoardToMatrix(coordinate);
+        this.board.cells[matrixCoordinate.row][matrixCoordinate.column] = Board.startingCellValue;
     }
 
     /**

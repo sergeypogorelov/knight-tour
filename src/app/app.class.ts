@@ -33,10 +33,11 @@ export class App {
         });
         
         const board = Board.createFromCells(Board.generateUntouchedCells());
-        board.setStartingPosition({ letter: BoardLetters.A, number: 3 });
-
         const knight = new Knight(board);
-        console.log(knight.getAllAvailableMoves({ row: 0, column: 0 }));
+        knight.setStartingPosition({ letter: BoardLetters.A, number: 2 });
+        
+        console.log(knight.findAllAvailableMoves({ row: 0, column: 0 }));
+        console.log(knight.findLastMove());
 
         const actionMessage: IStartSearchMessage = {
             action: Actions.SearchStart,

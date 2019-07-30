@@ -1,16 +1,23 @@
 import { Board } from "../../../common/entities/board.class";
+import { Knight } from "../../../common/entities/knight.class";
 
 export class KnightTour {
 
-    constructor(board: Board) {
-        if (!board)
-            throw new Error('Board is not specified.');
-
-        this._board = board;
+    get knight(): Knight {
+        return this._knight;
     }
 
-    
+    constructor(knight: Knight) {
+        if (!knight)
+            throw new Error('Knight is not specified.');
 
-    private _board: Board;
+        this._knight = knight;
+    }
+
+    search() {
+        
+    }
+
+    private _knight: Knight;
 
 }
