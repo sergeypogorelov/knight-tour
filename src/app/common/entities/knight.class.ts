@@ -1,6 +1,5 @@
 import { Board } from "./board.class";
 import { IMatrixCoordinate } from "../interfaces/matrix-coordinate.interface";
-import { IBoardCoordinate } from "../interfaces/board-coordinate.interface";
 
 /**
  * a chess knight
@@ -12,6 +11,13 @@ export class Knight {
      */
     get board(): Board {
         return this._board;
+    }
+
+    /**
+     * max count of moves in the knight's tour on the current board
+     */
+    get maxCountOfMoves(): number {
+        return this.board.countOfRows * this.board.countOfColumns;
     }
 
     /**
@@ -29,7 +35,7 @@ export class Knight {
     /**
      * checks if the move is available to the knight
      * 
-     * @param coordinate 
+     * @param coordinate move coordinate
      */
     checkIfMoveAvailable(coordinate: IMatrixCoordinate): boolean {
         if (!coordinate)
@@ -51,8 +57,8 @@ export class Knight {
         if (!currentCoordinate)
             throw new Error('Current coordinate is not specified.');
 
-        return this._availableMovesCheckers
-            .map(checker => checker(currentCoordinate))
+        return this._availableMovesGenerators
+            .map(moveGenerator => moveGenerator(currentCoordinate))
             .filter(possibleMoveCoordinate => possibleMoveCoordinate !== null);
     }
     
@@ -87,22 +93,52 @@ export class Knight {
     }
 
     /**
-     * sets starting position
+     * sets starting position of the knight on the board
      * 
-     * @param coordinate coordinate to set starting position
+     * @param coordinate coordinate to set the starting position
      */
-    setStartingPosition(coordinate: IBoardCoordinate) {
+    setStartingPosition(coordinate: IMatrixCoordinate) {
         if (!coordinate)
             throw new Error('Coordinate is not specified.');
 
-        const matrixCoordinate = this.board.castCoordinateFromBoardToMatrix(coordinate);
-        this.board.cells[matrixCoordinate.row][matrixCoordinate.column] = Board.startingCellValue;
+        this.board.cells[coordinate.row][coordinate.column] = Board.startingCellValue;
     }
 
     /**
-     * checkers of all possible moves of the knight
+     * Takes the specified move on the current board
+     * 
+     * @param coordinate move coordinate
+     * @param moveNumber the move number
      */
-    private _availableMovesCheckers: ((currentCoordinate: IMatrixCoordinate) => IMatrixCoordinate)[] = [
+    takeMove(coordinate: IMatrixCoordinate, moveNumber: number) {
+        if (!coordinate)
+            throw new Error('Coordinate is not specified.');
+
+        if (moveNumber <= Board.startingCellValue)
+            throw new Error(`Move number should be greater than ${Board.startingCellValue}`);
+
+        if (!this.checkIfMoveAvailable(coordinate))
+            throw new Error('Moving on the unavailable cell.');
+
+        this.board.cells[coordinate.row][coordinate.column] = moveNumber;
+    }
+
+    /**
+     * Untakes the specified move on the current board
+     * 
+     * @param coordinate move coordinate
+     */
+    untakeMove(coordinate: IMatrixCoordinate) {
+        if (!coordinate)
+            throw new Error('Coordinate is not specified.');
+
+        this.board.cells[coordinate.row][coordinate.column] = Board.untouchedCellValue;
+    }
+
+    /**
+     * moves generators of all possible moves of the knight
+     */
+    private _availableMovesGenerators: ((currentCoordinate: IMatrixCoordinate) => IMatrixCoordinate)[] = [
         /**
          * **
          * *

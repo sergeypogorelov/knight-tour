@@ -32,12 +32,9 @@ export class App {
             console.log(notificationMessage);
         });
         
-        const board = Board.createFromCells(Board.generateUntouchedCells());
+        const board = Board.createFromCells(Board.generateUntouchedCells(5, 5));
         const knight = new Knight(board);
-        knight.setStartingPosition({ letter: BoardLetters.A, number: 2 });
-        
-        console.log(knight.findAllAvailableMoves({ row: 0, column: 0 }));
-        console.log(knight.findLastMove());
+        knight.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.C, number: 3 }));
 
         const actionMessage: IStartSearchMessage = {
             action: Actions.SearchStart,

@@ -97,7 +97,7 @@ export class Board implements IBoard {
 
     /**
      * chess board cells
-     * number says the move number in the knight tour
+     * value says the move number in the knight tour
      */
     get cells(): number[][] {
         return this._cells;
