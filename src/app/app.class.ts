@@ -35,7 +35,7 @@ export class App {
         const board = Board.createFromCells(Board.generateUntouchedCells(5, 5));
         
         Knight.instance.board = board;
-        Knight.instance.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.C, number: 3 }));
+        Knight.instance.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.E, number: 3 }));
 
         const actionMessage: IStartSearchMessage = {
             action: Actions.SearchStart,
