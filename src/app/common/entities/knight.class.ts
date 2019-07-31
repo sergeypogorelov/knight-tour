@@ -2,34 +2,34 @@ import { Board } from "./board.class";
 import { IMatrixCoordinate } from "../interfaces/matrix-coordinate.interface";
 
 /**
- * a chess knight
+ * the chess knight
  */
 export class Knight {
 
     /**
+     * instance of the knight
+     */
+    static get instance(): Knight {
+        if (!Knight._instance) {
+            Knight._instance = new Knight();
+        }
+
+        return Knight._instance;
+    }
+
+    /**
      * the board on which the knight is
      */
-    get board(): Board {
-        return this._board;
-    }
+    board: Board = null;
 
     /**
      * max count of moves in the knight's tour on the current board
      */
     get maxCountOfMoves(): number {
-        return this.board.countOfRows * this.board.countOfColumns;
-    }
+        if (!this.board)
+            return 0;
 
-    /**
-     * creates a knight on the specified chess board
-     * 
-     * @param board chess board
-     */
-    constructor(board: Board) {
-        if (!board)
-            throw new Error('Board is not specified.');
-        
-        this._board = board;
+        return this.board.countOfRows * this.board.countOfColumns;
     }
 
     /**
@@ -40,6 +40,9 @@ export class Knight {
     checkIfMoveAvailable(coordinate: IMatrixCoordinate): boolean {
         if (!coordinate)
             throw new Error('Coordinate is not specified.');
+
+        if (!this.board)
+            throw new Error('Board is not specified.');
 
         return  coordinate.column >= 0 &&
                 coordinate.row >= 0 &&
@@ -57,6 +60,9 @@ export class Knight {
         if (!currentCoordinate)
             throw new Error('Current coordinate is not specified.');
 
+        if (!this.board)
+            throw new Error('Board is not specified.');
+
         return this._availableMovesGenerators
             .map(moveGenerator => moveGenerator(currentCoordinate))
             .filter(possibleMoveCoordinate => possibleMoveCoordinate !== null);
@@ -67,6 +73,9 @@ export class Knight {
      * returns NULL otherwise
      */
     findLastMove(): IMatrixCoordinate {
+        if (!this.board)
+            throw new Error('Board is not specified.');
+
         let result: IMatrixCoordinate = null;
 
         let row = -1;
@@ -101,6 +110,9 @@ export class Knight {
         if (!coordinate)
             throw new Error('Coordinate is not specified.');
 
+        if (!this.board)
+            throw new Error('Board is not specified.');
+
         this.board.cells[coordinate.row][coordinate.column] = Board.startingCellValue;
     }
 
@@ -117,6 +129,9 @@ export class Knight {
         if (moveNumber <= Board.startingCellValue)
             throw new Error(`Move number should be greater than ${Board.startingCellValue}`);
 
+        if (!this.board)
+            throw new Error('Board is not specified.');
+
         if (!this.checkIfMoveAvailable(coordinate))
             throw new Error('Moving on the unavailable cell.');
 
@@ -132,8 +147,16 @@ export class Knight {
         if (!coordinate)
             throw new Error('Coordinate is not specified.');
 
+        if (!this.board)
+            throw new Error('Board is not specified.');
+
         this.board.cells[coordinate.row][coordinate.column] = Board.untouchedCellValue;
     }
+
+    /**
+     * instance of the knight
+     */
+    private static _instance: Knight;
 
     /**
      * moves generators of all possible moves of the knight
@@ -226,8 +249,8 @@ export class Knight {
     ];
 
     /**
-     * current chess board
+     * creates a knight
      */
-    private _board: Board;
+    private constructor() {}
 
 }
