@@ -87,41 +87,67 @@ export class Knight {
             .filter(possibleMoveCoordinate => possibleMoveCoordinate !== null);
     }
 
-    findAllMovesCombinations(depth: number): Board[] {
+    /**
+     * finds and returns all possible move combinations with specified parameters
+     * 
+     * @param depth depth of the search
+     * @param moveCoordinate coordinate to start search from
+     * @param moveNumber move number on the specified coordinate
+     */
+    findAllMovesCombinations(depth: number, moveCoordinate: IMatrixCoordinate = null, moveNumber: number = null): Board[] {
         if (depth < 1)
             throw new Error('Depth cannot be less than 1.');
+
+        if (moveCoordinate === null) {
+            moveCoordinate = this.findLastMove();
+
+            if (moveCoordinate === null)
+                throw new Error('Cannot determine the coordinate to start search from.');
+        }
+
+        if (moveNumber === null) {
+            moveNumber = this.board.cells[moveCoordinate.row][moveCoordinate.column];
+        }
 
         this._movesCombinations = [];
 
         const newBoard = Board.createFromJSON(this.board.asJSON());
-        const newKnight = Knight.create(newBoard);
-
-        this.findAllMovesCombinationsRecursively(newKnight, depth);
+        this.findAllMovesCombinationsRecursively(newBoard, moveCoordinate, moveNumber, depth);
 
         return this._movesCombinations;
     }
 
+    /**
+     * moves combinations used by some private methods
+     */
     private _movesCombinations: Board[];
 
-    private findAllMovesCombinationsRecursively(knight: Knight, depth: number) {
+    /**
+     * searchs for all possible moves combinations recursively
+     * 
+     * @param board current board
+     * @param moveCoordinate current move coordinate
+     * @param moveNumber current move number
+     * @param depth depth counter
+     */
+    private findAllMovesCombinationsRecursively(board: Board, moveCoordinate: IMatrixCoordinate, moveNumber: number, depth: number) {
         if (depth === 0)
             return;
         
-        const lastMove = knight.findLastMove();
-        const lastMoveNumber = knight.board.cells[lastMove.row][lastMove.column];
+        const knight = Knight.create(board);
 
-        const availableMoves = knight.findAllAvailableMoves(lastMove);
+        const availableMoves = knight.findAllAvailableMoves(moveCoordinate);
         for (let i = 0; i < availableMoves.length; i++) {
             const availableMove = availableMoves[i];
 
-            knight.takeMove(availableMove, lastMoveNumber + 1);
+            knight.takeMove(availableMove, moveNumber + 1);
 
             const newBoard = Board.createFromJSON(knight.board.asJSON());
 
             if (depth === 1) {
                 this._movesCombinations.push(newBoard);
             } else {
-                this.findAllMovesCombinationsRecursively(Knight.create(newBoard), depth - 1);
+                this.findAllMovesCombinationsRecursively(newBoard, availableMove, moveNumber + 1, depth - 1);
             }
 
             knight.untakeMove(availableMove);
@@ -170,9 +196,6 @@ export class Knight {
         if (!coordinate)
             throw new Error('Coordinate is not specified.');
 
-        if (!this.board)
-            throw new Error('Board is not specified.');
-
         this.board.cells[coordinate.row][coordinate.column] = Board.startingCellValue;
     }
 
@@ -189,9 +212,6 @@ export class Knight {
         if (moveNumber <= Board.startingCellValue)
             throw new Error(`Move number should be greater than ${Board.startingCellValue}`);
 
-        if (!this.board)
-            throw new Error('Board is not specified.');
-
         if (!this.checkIfMoveAvailable(coordinate))
             throw new Error('Moving on the unavailable cell.');
 
@@ -206,9 +226,6 @@ export class Knight {
     untakeMove(coordinate: IMatrixCoordinate) {
         if (!coordinate)
             throw new Error('Coordinate is not specified.');
-
-        if (!this.board)
-            throw new Error('Board is not specified.');
 
         this.board.cells[coordinate.row][coordinate.column] = Board.untouchedCellValue;
     }
