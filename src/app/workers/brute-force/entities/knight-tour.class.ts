@@ -9,6 +9,13 @@ import { IBoard } from "../../../common/interfaces/board.interface";
 export class KnightTour {
 
     /**
+     * current knight
+     */
+    get knight(): Knight {
+        return this._knight;
+    }
+
+    /**
      * creates Knight's Tour search with specified board
      * 
      * @param board chess board
@@ -17,22 +24,24 @@ export class KnightTour {
         if (!board)
             throw new Error('Board is not specified.');
 
-        Knight.instance.board = board;
+        this._knight = new Knight(board);
     }
 
     /**
      * searches for the Knight's Tour
      */
     search() {
-        const lastMove = Knight.instance.findLastMove();
-        const moveNumber = Knight.instance.board.cells[lastMove.row][lastMove.column];
+        const lastMove = this.knight.findLastMove();
+        const moveNumber = this.knight.board.cells[lastMove.row][lastMove.column];
 
-        this.foundSolutions = [];
+        this._foundSolutions = [];
         this.searchKnightTour(lastMove, moveNumber);
 
     }
 
-    private foundSolutions: IBoard[];
+    private _knight: Knight;
+
+    private _foundSolutions: IBoard[];
 
     /**
      * searches for the Knight's Tour based on the last move of the knight
@@ -41,25 +50,25 @@ export class KnightTour {
      * @param lastMoveNumber move number
      */
     private searchKnightTour(lastMoveCoordinate: IMatrixCoordinate, lastMoveNumber: number): IBoard {
-        const maxMovesCount = Knight.instance.maxCountOfMoves;
+        const maxMovesCount = this.knight.maxCountOfMoves;
 
         if (lastMoveNumber === maxMovesCount - 1) {
-            return Knight.instance.board.asJSON();
+            return this.knight.board.asJSON();
         } else {
-            const availableMoves = Knight.instance.findAllAvailableMoves(lastMoveCoordinate);
+            const availableMoves = this.knight.findAllAvailableMoves(lastMoveCoordinate);
             for (let i = 0; i < availableMoves.length; i++) {
                 const newMove = availableMoves[i];
                 const newMoveNumber = lastMoveNumber + 1;
 
-                Knight.instance.takeMove(newMove, newMoveNumber);
+                this.knight.takeMove(newMove, newMoveNumber);
 
                 const result = this.searchKnightTour(newMove, newMoveNumber);
                 if (result) {
-                    this.foundSolutions.push(result);
+                    this._foundSolutions.push(result);
                     console.log(result);
                 }
 
-                Knight.instance.untakeMove(newMove);
+                this.knight.untakeMove(newMove);
             }
         }
 

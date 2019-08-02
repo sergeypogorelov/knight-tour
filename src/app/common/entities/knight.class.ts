@@ -1,4 +1,5 @@
 import { Board } from "./board.class";
+import { IBoard } from "../interfaces/board.interface";
 import { IMatrixCoordinate } from "../interfaces/matrix-coordinate.interface";
 
 /**
@@ -7,20 +8,11 @@ import { IMatrixCoordinate } from "../interfaces/matrix-coordinate.interface";
 export class Knight {
 
     /**
-     * instance of the knight
-     */
-    static get instance(): Knight {
-        if (!Knight._instance) {
-            Knight._instance = new Knight();
-        }
-
-        return Knight._instance;
-    }
-
-    /**
      * the board on which the knight is
      */
-    board: Board = null;
+    get board(): Board {
+        return this._board;
+    }
 
     /**
      * max count of moves in the knight's tour on the current board
@@ -33,6 +25,39 @@ export class Knight {
     }
 
     /**
+     * creates a knight on the specified board
+     * 
+     * @param board board on which the knight is
+     */
+    constructor(board: Board) {
+        this.setBoard(board);
+    }
+
+    /**
+     * creates a knight on the specified board
+     * 
+     * @param board board on which the knight is
+     */
+    static create(board: Board): Knight {
+        if (!board)
+            throw new Error('Board is not specified.');
+
+        return new Knight(board);
+    }
+
+    /**
+     * sets the specified board for the knight
+     * 
+     * @param board a chess board
+     */
+    setBoard(board: Board) {
+        if (!board)
+            throw new Error('Board is not specified.');
+
+        this._board = board;
+    }
+
+    /**
      * checks if the move is available to the knight
      * 
      * @param coordinate move coordinate
@@ -40,9 +65,6 @@ export class Knight {
     checkIfMoveAvailable(coordinate: IMatrixCoordinate): boolean {
         if (!coordinate)
             throw new Error('Coordinate is not specified.');
-
-        if (!this.board)
-            throw new Error('Board is not specified.');
 
         return  coordinate.column >= 0 &&
                 coordinate.row >= 0 &&
@@ -60,12 +82,50 @@ export class Knight {
         if (!currentCoordinate)
             throw new Error('Current coordinate is not specified.');
 
-        if (!this.board)
-            throw new Error('Board is not specified.');
-
         return this._availableMovesGenerators
             .map(moveGenerator => moveGenerator(currentCoordinate))
             .filter(possibleMoveCoordinate => possibleMoveCoordinate !== null);
+    }
+
+    findAllMovesCombinations(depth: number): Board[] {
+        if (depth < 1)
+            throw new Error('Depth cannot be less than 1.');
+
+        this._movesCombinations = [];
+
+        const newBoard = Board.createFromJSON(this.board.asJSON());
+        const newKnight = Knight.create(newBoard);
+
+        this.findAllMovesCombinationsRecursively(newKnight, depth);
+
+        return this._movesCombinations;
+    }
+
+    private _movesCombinations: Board[];
+
+    private findAllMovesCombinationsRecursively(knight: Knight, depth: number) {
+        if (depth === 0)
+            return;
+        
+        const lastMove = knight.findLastMove();
+        const lastMoveNumber = knight.board.cells[lastMove.row][lastMove.column];
+
+        const availableMoves = knight.findAllAvailableMoves(lastMove);
+        for (let i = 0; i < availableMoves.length; i++) {
+            const availableMove = availableMoves[i];
+
+            knight.takeMove(availableMove, lastMoveNumber + 1);
+
+            const newBoard = Board.createFromJSON(knight.board.asJSON());
+
+            if (depth === 1) {
+                this._movesCombinations.push(newBoard);
+            } else {
+                this.findAllMovesCombinationsRecursively(Knight.create(newBoard), depth - 1);
+            }
+
+            knight.untakeMove(availableMove);
+        }
     }
     
     /**
@@ -159,6 +219,11 @@ export class Knight {
     private static _instance: Knight;
 
     /**
+     * the board on which the knight is
+     */
+    private _board: Board = null;
+
+    /**
      * moves generators of all possible moves of the knight
      */
     private _availableMovesGenerators: ((currentCoordinate: IMatrixCoordinate) => IMatrixCoordinate)[] = [
@@ -247,10 +312,5 @@ export class Knight {
             return this.checkIfMoveAvailable(coordinate) ? coordinate : null;
         }
     ];
-
-    /**
-     * creates a knight
-     */
-    private constructor() {}
 
 }
