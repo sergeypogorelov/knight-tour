@@ -1,5 +1,4 @@
 import { Board } from "./board.class";
-import { IBoard } from "../interfaces/board.interface";
 import { IMatrixCoordinate } from "../interfaces/matrix-coordinate.interface";
 
 /**
@@ -116,43 +115,6 @@ export class Knight {
 
         return this._movesCombinations;
     }
-
-    /**
-     * moves combinations used by some private methods
-     */
-    private _movesCombinations: Board[];
-
-    /**
-     * searchs for all possible moves combinations recursively
-     * 
-     * @param board current board
-     * @param moveCoordinate current move coordinate
-     * @param moveNumber current move number
-     * @param depth depth counter
-     */
-    private findAllMovesCombinationsRecursively(board: Board, moveCoordinate: IMatrixCoordinate, moveNumber: number, depth: number) {
-        if (depth === 0)
-            return;
-        
-        const knight = Knight.create(board);
-
-        const availableMoves = knight.findAllAvailableMoves(moveCoordinate);
-        for (let i = 0; i < availableMoves.length; i++) {
-            const availableMove = availableMoves[i];
-
-            knight.takeMove(availableMove, moveNumber + 1);
-
-            const newBoard = Board.createFromJSON(knight.board.asJSON());
-
-            if (depth === 1) {
-                this._movesCombinations.push(newBoard);
-            } else {
-                this.findAllMovesCombinationsRecursively(newBoard, availableMove, moveNumber + 1, depth - 1);
-            }
-
-            knight.untakeMove(availableMove);
-        }
-    }
     
     /**
      * searchs for the last move on the board and returns its coordinate on success
@@ -231,14 +193,14 @@ export class Knight {
     }
 
     /**
-     * instance of the knight
-     */
-    private static _instance: Knight;
-
-    /**
      * the board on which the knight is
      */
     private _board: Board = null;
+
+    /**
+     * moves combinations used by some private methods
+     */
+    private _movesCombinations: Board[] = null;
 
     /**
      * moves generators of all possible moves of the knight
@@ -329,5 +291,37 @@ export class Knight {
             return this.checkIfMoveAvailable(coordinate) ? coordinate : null;
         }
     ];
+
+    /**
+     * searchs for all possible moves combinations recursively
+     * 
+     * @param board current board
+     * @param moveCoordinate current move coordinate
+     * @param moveNumber current move number
+     * @param depth depth counter
+     */
+    private findAllMovesCombinationsRecursively(board: Board, moveCoordinate: IMatrixCoordinate, moveNumber: number, depth: number) {
+        if (depth === 0)
+            return;
+        
+        const knight = Knight.create(board);
+
+        const availableMoves = knight.findAllAvailableMoves(moveCoordinate);
+        for (let i = 0; i < availableMoves.length; i++) {
+            const availableMove = availableMoves[i];
+
+            knight.takeMove(availableMove, moveNumber + 1);
+
+            const newBoard = Board.createFromJSON(knight.board.asJSON());
+
+            if (depth === 1) {
+                this._movesCombinations.push(newBoard);
+            } else {
+                this.findAllMovesCombinationsRecursively(newBoard, availableMove, moveNumber + 1, depth - 1);
+            }
+
+            knight.untakeMove(availableMove);
+        }
+    }
 
 }
