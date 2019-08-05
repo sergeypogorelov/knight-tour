@@ -65,7 +65,6 @@ export class KnightTour {
                 const result = this.searchKnightTour(newMove, newMoveNumber);
                 if (result) {
                     this._foundSolutions.push(result);
-                    console.log(result);
                 }
 
                 this.knight.untakeMove(newMove);

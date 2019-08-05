@@ -8,16 +8,5 @@ import { KnightTour } from "./entities/knight-tour.class";
 const ctx: Worker = self as any;
 
 ctx.addEventListener('message', ev => {
-    const actionMessage = ev.data as IActionMessage;
-    const startSearchMessage = actionMessage as IStartSearchMessage;
-
-    const board = Board.createFromJSON(startSearchMessage.board);
-    const knightTour = new KnightTour(board);
-
-    knightTour.search();
-
-    const notificationMessage: ISearchStartedMessage = {
-        notification: Notifications.SearchStarted
-    };
-    ctx.postMessage(notificationMessage);
+    /// worker message handler
 });

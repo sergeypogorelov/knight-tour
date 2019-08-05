@@ -27,32 +27,7 @@ export class App {
      * runs the app
      */
     run() {
-        const maxCountOfThreads = 8;
-
-        const boardWidth = 5;
-        const boardHeight = 5;
-        const board = Board.createFromCells(Board.generateUntouchedCells(boardWidth, boardHeight));
-        
-        const knightStartingPosition = board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.E, number: 3 });
-        const knight = Knight.create(board);
-
-        knight.setStartingPosition(knightStartingPosition);
-
-        console.log(knight.findAllMovesCombinations(2));
-
-        // const worker = new BruteForceWorker();
-        // worker.addEventListener('message', ev => {
-        //     const notificationMessage = ev.data as INotificationMessage;
-        //     console.log(notificationMessage);
-        // });
-        
-        
-
-        // const actionMessage: IStartSearchMessage = {
-        //     action: Actions.SearchStart,
-        //     board: board.asJSON()
-        // };
-        // worker.postMessage(actionMessage);
+        console.log('run');
     }
 
     /**

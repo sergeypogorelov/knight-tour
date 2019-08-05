@@ -77,9 +77,10 @@ export class Knight {
      * 
      * @param currentCoordinate current coordinate of the knight
      */
-    findAllAvailableMoves(currentCoordinate: IMatrixCoordinate): IMatrixCoordinate[] {
-        if (!currentCoordinate)
-            throw new Error('Current coordinate is not specified.');
+    findAllAvailableMoves(currentCoordinate: IMatrixCoordinate = null): IMatrixCoordinate[] {
+        if (!currentCoordinate) {
+            currentCoordinate = this.findLastMove();
+        }
 
         return this._availableMovesGenerators
             .map(moveGenerator => moveGenerator(currentCoordinate))
