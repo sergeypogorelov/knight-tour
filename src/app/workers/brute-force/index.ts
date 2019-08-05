@@ -6,7 +6,7 @@ import { Board } from "../../common/entities/board.class";
 import { KnightTour } from "./entities/knight-tour.class";
 
 const ctx: Worker = self as any;
-
-ctx.addEventListener('message', ev => {
-    /// worker message handler
-});
+const message: ISearchStartedMessage = {
+    notification: Notifications.SearchStarted
+};
+ctx.postMessage(message);

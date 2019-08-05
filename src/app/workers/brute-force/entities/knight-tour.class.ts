@@ -30,17 +30,24 @@ export class KnightTour {
     /**
      * searches for the Knight's Tour
      */
-    search() {
+    search(): IBoard[] {
         const lastMove = this.knight.findLastMove();
         const moveNumber = this.knight.board.cells[lastMove.row][lastMove.column];
 
         this._foundSolutions = [];
         this.searchKnightTour(lastMove, moveNumber);
 
+        return this._foundSolutions;
     }
 
+    /**
+     * current knight
+     */
     private _knight: Knight;
 
+    /**
+     * found solutions during the last search
+     */
     private _foundSolutions: IBoard[];
 
     /**

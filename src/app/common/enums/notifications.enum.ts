@@ -7,5 +7,15 @@ export enum Notifications {
     /**
      * notifies the search has been stopped
      */
-    SearchStopped
+    SearchStopped,
+
+    /**
+     * notifies about the search progress
+     */
+    SearchProgress,
+
+    /**
+     * notifies about a found solution
+     */
+    SearchResult
 }
