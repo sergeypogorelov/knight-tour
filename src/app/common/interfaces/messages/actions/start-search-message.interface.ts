@@ -3,6 +3,6 @@ import { IActionMessage } from "./action-message.interface";
 import { Actions } from "../../../enums/actions.enum";
 
 export interface IStartSearchMessage extends IActionMessage {
-    action: Actions.SearchStart;
+    type: Actions.SearchStart;
     board: IBoard;
 }

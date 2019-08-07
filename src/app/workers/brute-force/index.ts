@@ -7,6 +7,7 @@ import { KnightTour } from "./entities/knight-tour.class";
 
 const ctx: Worker = self as any;
 const message: ISearchStartedMessage = {
-    notification: Notifications.SearchStarted
+    tag: '0',
+    type: Notifications.SearchStarted
 };
 ctx.postMessage(message);

@@ -7,7 +7,6 @@ import { Board } from './common/entities/board.class';
 import { BoardLetters } from './common/enums/board-letters.enum';
 import { Knight } from './common/entities/knight.class';
 import { IMatrixCoordinate } from './common/interfaces/matrix-coordinate.interface';
-import { Main } from './main/entities/main.class';
 
 /**
  * represents the application
@@ -28,7 +27,7 @@ export class App {
      * runs the app
      */
     run() {
-        const main = new Main();
+        
     }
 
     /**

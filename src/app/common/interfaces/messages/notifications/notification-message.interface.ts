@@ -1,5 +1,6 @@
 import { Notifications } from "../../../enums/notifications.enum";
 
 export interface INotificationMessage {
-    notification: Notifications;
+    tag: string;
+    type: Notifications;
 }

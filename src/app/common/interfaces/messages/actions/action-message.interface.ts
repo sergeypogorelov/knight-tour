@@ -1,5 +1,6 @@
 import { Actions } from "../../../enums/actions.enum";
 
 export interface IActionMessage {
-    action: Actions;
+    tag: string;
+    type: Actions;
 }
