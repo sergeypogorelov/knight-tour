@@ -1,7 +1,14 @@
-import { Board } from "../../../common/entities/board.class";
-import { Knight } from "../../../common/entities/knight.class";
+import { Subject, Observable } from 'rxjs';
+
 import { IMatrixCoordinate } from "../../../common/interfaces/matrix-coordinate.interface";
 import { IBoard } from "../../../common/interfaces/board.interface";
+
+import { ISearchStartedMessage } from '../../../common/interfaces/messages/notifications/search-started.interface';
+import { ISearchStoppedMessage } from '../../../common/interfaces/messages/notifications/search-stopped.interface';
+
+import { Board } from "../../../common/entities/board.class";
+import { Knight } from "../../../common/entities/knight.class";
+import { Notifications } from '../../../common/enums/notifications.enum';
 
 /**
  * Knight's Tour search
@@ -13,6 +20,20 @@ export class KnightTour {
      */
     get knight(): Knight {
         return this._knight;
+    }
+
+    /**
+     * emits each time the search has been started
+     */
+    get searchStarts(): Observable<ISearchStartedMessage> {
+        return this._searchStartsSubject.asObservable();
+    }
+
+    /**
+     * emits each time before the search has been stopped
+     */
+    get searchStops(): Observable<ISearchStoppedMessage> {
+        return this._searchStopsSubject.asObservable();
     }
 
     /**
@@ -30,12 +51,25 @@ export class KnightTour {
     /**
      * searches for the Knight's Tour
      */
-    search(): IBoard[] {
+    search(tag: string): IBoard[] {
         const lastMove = this.knight.findLastMove();
         const moveNumber = this.knight.board.cells[lastMove.row][lastMove.column];
 
         this._foundSolutions = [];
+
+        const searchStartMessage: ISearchStartedMessage = {
+            tag: tag,
+            type: Notifications.SearchStarted
+        };
+        this._searchStartsSubject.next(searchStartMessage);
+
         this.searchKnightTour(lastMove, moveNumber);
+
+        const searchStopMessage: ISearchStoppedMessage = {
+            tag: tag,
+            type: Notifications.SearchStopped
+        };
+        this._searchStopsSubject.next(searchStopMessage);
 
         return this._foundSolutions;
     }
@@ -49,6 +83,10 @@ export class KnightTour {
      * found solutions during the last search
      */
     private _foundSolutions: IBoard[];
+
+    private _searchStartsSubject = new Subject<ISearchStartedMessage>();
+
+    private _searchStopsSubject = new Subject<ISearchStoppedMessage>();
 
     /**
      * searches for the Knight's Tour based on the last move of the knight
