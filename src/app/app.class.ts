@@ -1,12 +1,12 @@
 import BruteForceWorker from 'worker-loader!./workers/brute-force';
 
-import { INotificationMessage } from './common/interfaces/messages/notifications/notification-message.interface';
 import { IStartSearchMessage } from './common/interfaces/messages/actions/start-search-message.interface';
+
 import { Actions } from './common/enums/actions.enum';
-import { Board } from './common/entities/board.class';
 import { BoardLetters } from './common/enums/board-letters.enum';
+
+import { Board } from './common/entities/board.class';
 import { Knight } from './common/entities/knight.class';
-import { IMatrixCoordinate } from './common/interfaces/matrix-coordinate.interface';
 
 /**
  * represents the application
@@ -27,7 +27,22 @@ export class App {
      * runs the app
      */
     run() {
-        
+        const board = Board.createFromCells(Board.generateUntouchedCells(5, 5));
+        const knight = new Knight(board);
+
+        knight.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.B, number: 2 }));
+
+        const worker = new BruteForceWorker();
+        worker.addEventListener('message', message => console.log(message));
+        worker.addEventListener('error', error => console.error(error));
+
+        const message: IStartSearchMessage = {
+            tag: 'thread 1',
+            type: Actions.SearchStart,
+            board: board.asJSON()
+        };
+
+        worker.postMessage(message);
     }
 
     /**

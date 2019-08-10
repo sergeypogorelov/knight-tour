@@ -1,5 +1,10 @@
 export enum Notifications {
     /**
+     * notifies the search has run into a error
+     */
+    SearchError,
+
+    /**
      * notifies the search has been started
      */
     SearchStarted,
