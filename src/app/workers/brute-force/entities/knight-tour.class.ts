@@ -1,17 +1,10 @@
-import { Subject, Observable } from 'rxjs';
-
 import { IMatrixCoordinate } from "../../../common/interfaces/matrix-coordinate.interface";
 import { IBoard } from "../../../common/interfaces/board.interface";
-
-import { ISearchStartedMessage } from '../../../common/interfaces/messages/notifications/search-started.interface';
-import { ISearchStoppedMessage } from '../../../common/interfaces/messages/notifications/search-stopped.interface';
-import { ISearchResultMessage } from '../../../common/interfaces/messages/notifications/search-result.interface';
-import { ISearchProgressMessage } from '../../../common/interfaces/messages/notifications/search-progress.interface';
-
-import { Notifications } from '../../../common/enums/notifications.enum';
+import { INotifications } from '../interfaces/notifications.interface';
 
 import { Board } from "../../../common/entities/board.class";
 import { Knight } from "../../../common/entities/knight.class";
+import { NotificationsWrapper } from './notifications-wrapper.class';
 
 const PROGRESS_DIVIDER = 1000;
 
@@ -28,31 +21,10 @@ export class KnightTour {
     }
 
     /**
-     * emits each time the search has been started
+     * notifications from the search of the Knight's Tour
      */
-    get searchStarts(): Observable<ISearchStartedMessage> {
-        return this._searchStartSubject.asObservable();
-    }
-
-    /**
-     * emits each time a solution has been found
-     */
-    get searchResultFound(): Observable<ISearchResultMessage> {
-        return this._searchResultSubject.asObservable();
-    }
-
-    /**
-     * emits each time a progress report is done
-     */
-    get searchProgressReportDone(): Observable<ISearchProgressMessage> {
-        return this._searchProgressSubject.asObservable();
-    }
-
-    /**
-     * emits each time before the search has been stopped
-     */
-    get searchStops(): Observable<ISearchStoppedMessage> {
-        return this._searchStopSubject.asObservable();
+    get notifications(): INotifications {
+        return this._notificatiionsWrapper.interface;
     }
 
     /**
@@ -65,6 +37,7 @@ export class KnightTour {
             throw new Error('Board is not specified.');
 
         this._knight = new Knight(board);
+        this._notificatiionsWrapper = new NotificationsWrapper();
     }
 
     /**
@@ -81,9 +54,9 @@ export class KnightTour {
         const lastMove = this.knight.findLastMove();
         const moveNumber = this.knight.board.cells[lastMove.row][lastMove.column];
 
-        this.notifySearchStarted();
+        this._notificatiionsWrapper.notifySearchStarted(this._tag);
         this.searchKnightTour(lastMove, moveNumber);
-        this.notifySearchStopped();
+        this._notificatiionsWrapper.notifySearchStopped(this._tag);
 
         return this._foundSolutions;
     }
@@ -99,6 +72,11 @@ export class KnightTour {
     private _knight: Knight;
 
     /**
+     * notifications wrapper
+     */
+    private _notificatiionsWrapper: NotificationsWrapper;
+
+    /**
      * found solutions during the last search
      */
     private _foundSolutions: IBoard[];
@@ -112,26 +90,6 @@ export class KnightTour {
      * count of untaken moves
      */
     private _movesUntaken: number;
-
-    /**
-     * subject for search starts observable
-     */
-    private _searchStartSubject = new Subject<ISearchStartedMessage>();
-
-    /**
-     * subject for search progress report done observable
-     */
-    private _searchProgressSubject = new Subject<ISearchProgressMessage>();
-
-    /**
-     * subject for search result found observable
-     */
-    private _searchResultSubject = new Subject<ISearchResultMessage>();
-
-    /**
-     * subject for search stop observable
-     */
-    private _searchStopSubject = new Subject<ISearchStoppedMessage>();
 
     /**
      * searches for the Knight's Tour based on the last move of the knight
@@ -154,12 +112,12 @@ export class KnightTour {
                 this._movesTaken++;
 
                 if (this._movesTaken % PROGRESS_DIVIDER === 0) {
-                    this.notifySearchProgress();
+                    this._notificatiionsWrapper.notifySearchProgress(this._tag, this._movesTaken, this._movesUntaken);
                 }
 
                 const result = this.searchKnightTour(newMove, newMoveNumber);
                 if (result) {
-                    this.notifySearchResult(result);
+                    this._notificatiionsWrapper.notifySearchResult(this._tag, result);
                     this._foundSolutions.push(result);
                 }
 
@@ -167,65 +125,12 @@ export class KnightTour {
                 this._movesUntaken++;
 
                 if (this._movesUntaken % PROGRESS_DIVIDER === 0) {
-                    this.notifySearchProgress();
+                    this._notificatiionsWrapper.notifySearchProgress(this._tag, this._movesTaken, this._movesUntaken);
                 }
             }
         }
 
         return null;
-    }
-
-    /**
-     * notifies the search has been started
-     */
-    private notifySearchStarted() {
-        const searchStartMessage: ISearchStartedMessage = {
-            tag: this._tag,
-            type: Notifications.SearchStarted
-        };
-
-        this._searchStartSubject.next(searchStartMessage);
-    }
-
-    /**
-     * notifies about search progress
-     */
-    private notifySearchProgress() {
-        const searchProgressMessage: ISearchProgressMessage = {
-            tag: this._tag,
-            type: Notifications.SearchProgress,
-            movesTaken: this._movesTaken,
-            movesUntaken: this._movesUntaken
-        };
-
-        this._searchProgressSubject.next(searchProgressMessage);
-    }
-
-    /**
-     * notifies about solution found
-     * 
-     * @param board solution
-     */
-    private notifySearchResult(board: IBoard) {
-        const searchResultMessage: ISearchResultMessage = {
-            tag: this._tag,
-            type: Notifications.SearchResult,
-            board
-        };
-
-        this._searchResultSubject.next(searchResultMessage);
-    }
-
-    /**
-     * notifies the search has been stopped
-     */
-    private notifySearchStopped() {
-        const searchStopMessage: ISearchStoppedMessage = {
-            tag: this._tag,
-            type: Notifications.SearchStopped
-        };
-
-        this._searchStopSubject.next(searchStopMessage);
     }
 
 }

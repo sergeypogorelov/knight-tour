@@ -22,10 +22,10 @@ ctx.addEventListener('message', message => {
 
         const knightTour = new KnightTour(Board.createFromJSON(actionMessage.board));
         
-        knightTour.searchStarts.subscribe(message => ctx.postMessage(message));
-        knightTour.searchProgressReportDone.subscribe(message => ctx.postMessage(message));
-        knightTour.searchResultFound.subscribe(message => ctx.postMessage(message));
-        knightTour.searchStops.subscribe(message => ctx.postMessage(message));
+        knightTour.notifications.searchStarts.subscribe(message => ctx.postMessage(message));
+        knightTour.notifications.searchProgressReportDone.subscribe(message => ctx.postMessage(message));
+        knightTour.notifications.searchResultFound.subscribe(message => ctx.postMessage(message));
+        knightTour.notifications.searchStops.subscribe(message => ctx.postMessage(message));
 
         knightTour.search(actionMessage.tag);
     }
