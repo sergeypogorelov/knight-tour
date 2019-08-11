@@ -5,4 +5,5 @@ import { Actions } from "../../../enums/actions.enum";
 export interface IStartSearchMessage extends IActionMessage {
     type: Actions.SearchStart;
     board: IBoard;
+    maxThreadCount: number;
 }

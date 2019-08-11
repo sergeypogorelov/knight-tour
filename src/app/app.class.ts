@@ -39,7 +39,8 @@ export class App {
         const message: IStartSearchMessage = {
             tag: 'thread 1',
             type: Actions.SearchStart,
-            board: board.asJSON()
+            board: board.asJSON(),
+            maxThreadCount: 4
         };
 
         worker.postMessage(message);
