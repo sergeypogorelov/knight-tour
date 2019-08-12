@@ -9,6 +9,7 @@ import { Notifications } from "../../common/enums/notifications.enum";
 
 import { Board } from "../../common/entities/board.class";
 import { Knight } from "../../common/entities/knight.class";
+import { NotificationsHandler } from './entities/notifications-handler.class';
 
 const ctx: Worker = self as any;
 
@@ -42,18 +43,26 @@ ctx.addEventListener('message', message => {
             }
         } while(boards.length < actionMessage.maxThreadCount);
 
-        const searchWorker = new SearchWorker();
-        searchWorker.addEventListener('message', message => console.log(message));
+        const notificationHandler = new NotificationsHandler();
 
-        const newMessage: IStartSearchMessage = {
-            tag: '1',
-            type: Actions.SearchStart,
-            board: boards[0].asJSON(),
-            maxThreadCount: null
-        };
-        searchWorker.postMessage(newMessage);
+        notificationHandler.notification.subscribe(message => ctx.postMessage(message));
 
-        console.log(boards);
+        const searchWorkers: SearchWorker[] = [];
+        for (let i = 0;  i < actionMessage.maxThreadCount && i < boards.length; i++) {
+            const searchWorker = new SearchWorker();
+            searchWorker.addEventListener('message', ev => notificationHandler.handle(ev.data));
+            searchWorkers.push(searchWorker);
+        }
+
+        searchWorkers.forEach((worker, index) => {
+            const startMessage: IStartSearchMessage = {
+                tag: `${index + 1}`,
+                type: Actions.SearchStart,
+                board: boards[index].asJSON(),
+                maxThreadCount: null
+            };
+            worker.postMessage(startMessage);
+        });
     }
 });
 

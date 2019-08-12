@@ -1,29 +1,77 @@
+import { Subject, Observable } from 'rxjs';
+import { debounceTime, delay } from 'rxjs/operators';
+
 import { IBoard } from "../../../common/interfaces/board.interface";
-import { INotifications } from "../interfaces/notifications.interface";
+import { INotificationMessage } from '../../../common/interfaces/messages/notifications/notification-message.interface';
+import { ISearchStartedMessage } from '../../../common/interfaces/messages/notifications/search-started.interface';
+import { ISearchProgressMessage } from '../../../common/interfaces/messages/notifications/search-progress.interface';
+import { ISearchResultMessage } from '../../../common/interfaces/messages/notifications/search-result.interface';
+import { ISearchStoppedMessage } from '../../../common/interfaces/messages/notifications/search-stopped.interface';
+
 import { NotificationsWrapper } from "./notifications-wrapper.class";
+import { Notifications } from '../../../common/enums/notifications.enum';
+
+const GENERAL_DELAY = 5;
+const REPORT_DELAY = 20;
 
 export class NotificationsHandler {
-    get notifications(): INotifications {
-        return this._notifications;
+    get notification(): Observable<INotificationMessage> {
+        return this._notificationObservable;
     }
 
     constructor() {
         this._notificationsWrapper = new NotificationsWrapper();
+        this._generalSubject = new Subject<INotificationMessage>();
 
-        this._notifications = {
-            searchStarts: this._notificationsWrapper.interface.searchStarts,
-            searchProgressReportDone: this._notificationsWrapper.interface.searchProgressReportDone,
-            searchResultFound: this._notificationsWrapper.interface.searchResultFound,
-            searchStops: this._notificationsWrapper.interface.searchStops
-        };
+        this._notificationsWrapper.interface.searchStarts
+            .subscribe(messsage => this._generalSubject.next(messsage));
+
+        this._notificationsWrapper.interface.searchProgressReportDone
+            .pipe(debounceTime(REPORT_DELAY))
+            .subscribe(message => this._generalSubject.next(message));
+        
+        this._notificationsWrapper.interface.searchResultFound
+            .subscribe(message => this._generalSubject.next(message));
+
+        this._notificationsWrapper.interface.searchStops
+            .subscribe(message => this._generalSubject.next(message));
+        
+        this._notificationObservable = this._generalSubject.pipe(delay(GENERAL_DELAY));
     }
+
+    handle(message: INotificationMessage) {
+        switch(message.type) {
+            case Notifications.SearchStarted:
+                const startMessage = message as ISearchStartedMessage;
+                this.notifySearchStarted(startMessage.tag);
+                break;
+            case Notifications.SearchProgress:
+                const progressMessage = message as ISearchProgressMessage;
+                this.notifySearchProgress(progressMessage.tag, progressMessage.movesTaken, progressMessage.movesUntaken);
+                break;
+            case Notifications.SearchResult:
+                const resultMessage = message as ISearchResultMessage;
+                this.notifySearchResult(resultMessage.tag, resultMessage.board);
+                break;
+            case Notifications.SearchStopped:
+                const stopMessage = message as ISearchStoppedMessage;
+                this.notifySearchStopped(stopMessage.tag);
+                break;
+        }
+    }
+
+    private _notificationsWrapper: NotificationsWrapper;
+
+    private _generalSubject: Subject<INotificationMessage>;
+
+    private _notificationObservable: Observable<INotificationMessage>;
 
     /**
      * notifies the search has been started
      * 
      * @param tag thread tag
      */
-    notifySearchStarted(tag: string) {
+    private notifySearchStarted(tag: string) {
         this._notificationsWrapper.notifySearchStarted(tag);
     }
 
@@ -34,7 +82,7 @@ export class NotificationsHandler {
      * @param movesTaken count of taken moves during the search
      * @param movesUntaken count of untaken moves during the search
      */
-    notifySearchProgress(tag: string, movesTaken: number, movesUntaken: number) {
+    private notifySearchProgress(tag: string, movesTaken: number, movesUntaken: number) {
         this._notificationsWrapper.notifySearchProgress(tag, movesTaken, movesUntaken);
     }
 
@@ -44,7 +92,7 @@ export class NotificationsHandler {
      * @param tag thread tag
      * @param board solution
      */
-    notifySearchResult(tag: string, board: IBoard) {
+    private notifySearchResult(tag: string, board: IBoard) {
         this._notificationsWrapper.notifySearchResult(tag, board);
     }
 
@@ -53,11 +101,7 @@ export class NotificationsHandler {
      * 
      * @param tag thread tag
      */
-    notifySearchStopped(tag: string) {
+    private notifySearchStopped(tag: string) {
         this._notificationsWrapper.notifySearchStopped(tag);
     }
-
-    private _notifications: INotifications;
-
-    private _notificationsWrapper: NotificationsWrapper;
 }
