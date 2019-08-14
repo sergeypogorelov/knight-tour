@@ -43,14 +43,31 @@ ctx.addEventListener('message', message => {
             }
         } while(boards.length < actionMessage.maxThreadCount);
 
-        const notificationHandler = new NotificationsHandler();
+        console.log(boards.length);
 
-        notificationHandler.notification.subscribe(message => ctx.postMessage(message));
+        const notificationsHandler = new NotificationsHandler();
+        notificationsHandler.generalNotification.subscribe(message => ctx.postMessage(message));
+        notificationsHandler.searchStopNotification.subscribe(message => {
+            if (boards.length > 0) {
+                const board = boards.pop();
+                if (board) {
+                    const index = +message.tag - 1;
+                    const startMessage: IStartSearchMessage = {
+                        tag: `${index + 1}`,
+                        type: Actions.SearchStart,
+                        board: board.asJSON(),
+                        maxThreadCount: null
+                    };
+                    searchWorkers[index].postMessage(startMessage);
+                }
+            }
+            
+        });
 
         const searchWorkers: SearchWorker[] = [];
         for (let i = 0;  i < actionMessage.maxThreadCount && i < boards.length; i++) {
             const searchWorker = new SearchWorker();
-            searchWorker.addEventListener('message', ev => notificationHandler.handle(ev.data));
+            searchWorker.addEventListener('message', ev => notificationsHandler.handle(ev.data));
             searchWorkers.push(searchWorker);
         }
 
@@ -63,6 +80,8 @@ ctx.addEventListener('message', message => {
             };
             worker.postMessage(startMessage);
         });
+
+        boards.splice(0, searchWorkers.length);
     }
 });
 

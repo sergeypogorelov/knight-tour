@@ -30,14 +30,14 @@ export class App {
         const board = Board.createFromCells(Board.generateUntouchedCells(5, 5));
         const knight = new Knight(board);
 
-        knight.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.B, number: 2 }));
+        knight.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.D, number: 2 }));
 
         const worker = new BruteForceWorker();
-        worker.addEventListener('message', message => console.log(message));
+        worker.addEventListener('message', message => console.log(message.data));
         worker.addEventListener('error', error => console.error(error));
 
         const message: IStartSearchMessage = {
-            tag: 'thread 1',
+            tag: 'main-worker',
             type: Actions.SearchStart,
             board: board.asJSON(),
             maxThreadCount: 4
