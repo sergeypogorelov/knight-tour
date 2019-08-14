@@ -1,5 +1,5 @@
-import { Subject, Observable, interval } from "rxjs";
-import { merge, mergeMap } from 'rxjs/operators';
+import { Subject, Observable } from "rxjs";
+import { merge, throttleTime } from 'rxjs/operators';
 
 import { INotificationMessage } from "../../../common/interfaces/messages/notifications/notification-message.interface";
 import { ISearchStoppedMessage } from "../../../common/interfaces/messages/notifications/search-stopped.interface";
@@ -7,7 +7,7 @@ import { ISearchProgressMessage } from "../../../common/interfaces/messages/noti
 
 import { Notifications } from "../../../common/enums/notifications.enum";
 
-const DELAY = 100;
+const DELAY = 5;
 
 export class NotificationsHandler {
     get generalNotification(): Observable<INotificationMessage> {
@@ -24,7 +24,7 @@ export class NotificationsHandler {
         this._generalObservable = this._generalSubject
             .asObservable()
             .pipe(merge(this._searchStopObservable))
-            .pipe(merge(this._progressSubject)); /// there should be a delay
+            .pipe(merge(this._progressSubject.pipe(throttleTime(DELAY))));
     }
 
     handle(message: INotificationMessage) {
