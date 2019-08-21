@@ -87,9 +87,10 @@ export class NotificationsWrapper {
      * 
      * @param tag thread tag
      */
-    notifySearchStopped(tag: string) {
+    notifySearchStopped(tag: string, countOfMoves: number) {
         const searchStopMessage: ISearchStoppedMessage = {
             tag,
+            countOfMoves,
             type: Notifications.SearchStopped
         };
 

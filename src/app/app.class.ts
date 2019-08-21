@@ -30,7 +30,7 @@ export class App {
         const board = Board.createFromCells(Board.generateUntouchedCells(5, 5));
         const knight = new Knight(board);
 
-        knight.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.D, number: 2 }));
+        knight.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.C, number: 3 }));
 
         const worker = new BruteForceWorker();
         worker.addEventListener('message', message => console.log(message.data));

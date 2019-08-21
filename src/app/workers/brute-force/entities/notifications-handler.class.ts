@@ -22,7 +22,6 @@ export class NotificationsHandler {
         this._searchStopObservable = this._searchStopSubject.asObservable();
 
         this._generalObservable = this._generalSubject
-            .asObservable()
             .pipe(merge(this._searchStopObservable))
             .pipe(merge(this._progressSubject.pipe(throttleTime(DELAY))));
     }

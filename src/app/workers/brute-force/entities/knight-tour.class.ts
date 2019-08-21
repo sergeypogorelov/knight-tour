@@ -56,7 +56,7 @@ export class KnightTour {
 
         this._notificatiionsWrapper.notifySearchStarted(this._tag);
         this.searchKnightTour(lastMove, moveNumber);
-        this._notificatiionsWrapper.notifySearchStopped(this._tag);
+        this._notificatiionsWrapper.notifySearchStopped(this._tag, this._movesTaken);
 
         return this._foundSolutions;
     }
