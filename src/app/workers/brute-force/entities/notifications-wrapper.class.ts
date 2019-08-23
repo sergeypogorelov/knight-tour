@@ -1,13 +1,13 @@
 import { Subject } from "rxjs";
 
+import { Notifications } from "../../../common/enums/notifications.enum";
+
 import { INotifications } from "../interfaces/notifications.interface";
 import { ISearchStartedMessage } from "../../../common/interfaces/messages/notifications/search-started.interface";
 import { ISearchProgressMessage } from "../../../common/interfaces/messages/notifications/search-progress.interface";
 import { ISearchResultMessage } from "../../../common/interfaces/messages/notifications/search-result.interface";
 import { ISearchStoppedMessage } from "../../../common/interfaces/messages/notifications/search-stopped.interface";
 import { IBoard } from "../../../common/interfaces/board.interface";
-
-import { Notifications } from "../../../common/enums/notifications.enum";
 
 export class NotificationsWrapper {
     /**
