@@ -55,7 +55,7 @@ export class SearchWorkersWrapper {
         this._notificationSubject = new Subject<INotificationMessage>();
         this._notificationObservable = this._notificationSubject.asObservable();
 
-        this._searchStopsSubject = new Subject<any>();
+        this._searchStopsSubject = new Subject<SearchWorkersWrapperStop>();
         this._searchStopsObservable = this._searchStopsSubject.asObservable();
     }
 

@@ -8,6 +8,10 @@ import { BoardLetters } from './common/enums/board-letters.enum';
 import { Board } from './common/entities/board.class';
 import { Knight } from './common/entities/knight.class';
 
+import { LayoutModel } from './main/models/layout/layout.model';
+
+const liveEvent = require('live-event');
+
 /**
  * represents the application
  */
@@ -27,23 +31,10 @@ export class App {
      * runs the app
      */
     run() {
-        const board = Board.createFromCells(Board.generateUntouchedCells(5, 5));
-        const knight = new Knight(board);
+        liveEvent('click', '.btn', (ev: any) => console.log(ev));
 
-        knight.setStartingPosition(board.castCoordinateFromBoardToMatrix({ letter: BoardLetters.C, number: 3 }));
-
-        const worker = new BruteForceWorker();
-        worker.addEventListener('message', message => console.log(message.data));
-        worker.addEventListener('error', error => console.error(error));
-
-        const message: IStartSearchMessage = {
-            tag: 'main-worker',
-            type: Actions.SearchStart,
-            board: board.asJSON(),
-            maxThreadCount: 4
-        };
-
-        worker.postMessage(message);
+        const layoutModel = new LayoutModel('root');
+        layoutModel.mount();
     }
 
     /**
