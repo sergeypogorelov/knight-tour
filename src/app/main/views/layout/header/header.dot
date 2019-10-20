@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-2">
-            <h1>Knight Tour</h1>
+            <h1>{{= it.title }}</h1>
         </div>
         <div class="col-10">
             <button class="btn btn-primary">Search</button>

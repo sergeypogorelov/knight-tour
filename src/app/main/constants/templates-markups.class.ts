@@ -1,5 +1,5 @@
-const LAYOUT_MARKUP = require('../models/layout/layout.dot').default;
-const HEADER_MARKUP = require('../models/layout/header/header.dot').default;
+const LAYOUT_MARKUP = require('../views/layout/layout.dot').default;
+const HEADER_MARKUP = require('../views/layout/header/header.dot').default;
 
 /**
  * contains doT markup of the templates

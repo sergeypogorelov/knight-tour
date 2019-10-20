@@ -8,7 +8,7 @@ import { BoardLetters } from './common/enums/board-letters.enum';
 import { Board } from './common/entities/board.class';
 import { Knight } from './common/entities/knight.class';
 
-import { LayoutModel } from './main/models/layout/layout.model';
+import { LayoutView } from './main/views/layout/layout-view.class';
 
 const liveEvent = require('live-event');
 
@@ -33,8 +33,9 @@ export class App {
     run() {
         liveEvent('click', '.btn', (ev: any) => console.log(ev));
 
-        const layoutModel = new LayoutModel('root');
-        layoutModel.mount();
+        const layoutView = new LayoutView('root');
+        layoutView.mount();
+        layoutView.mountChildViews();
     }
 
     /**
