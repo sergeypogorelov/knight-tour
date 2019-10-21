@@ -33,11 +33,11 @@ export class LayoutView extends ViewContainer {
         return this.dotTemplate(this.data);
     }
 
-    dotTemplate: (data: object) => string;
-
     private _headerId: string = 'layout-header';
 
     private _headerView: HeaderView;
 
     private _data: LayoutViewData;
+
+    private dotTemplate: (data: object) => string;
 }
