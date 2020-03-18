@@ -1,23 +1,15 @@
 {
-    "compilerOptions": {
-        "outDir": "./dist",
-        "module": "es6",
-        "target": "es5",
-        "moduleResolution": "node",
-        "lib": [
-            "webworker",
-            "es6",
-            "scripthost",
-            "dom"
-        ],
-        "allowJs": true,
-        "noImplicitAny": true,
-        "sourceMap": true
-    },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "es6",
+    "target": "es5",
+    "moduleResolution": "node",
+    "lib": ["WebWorker", "ES6", "ScriptHost", "DOM"],
+    "allowJs": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "jsx": "react"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
