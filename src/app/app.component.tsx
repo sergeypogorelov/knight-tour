@@ -8,6 +8,8 @@ import {
 
 import BruteForceWorker from "worker-loader!./workers/brute-force";
 
+import { urlFragments } from "./main/constants/url-fragments";
+
 import { Actions } from "./common/enums/actions.enum";
 import { IStartSearchMessage } from "./common/interfaces/messages/actions/start-search-message.interface";
 
@@ -15,6 +17,7 @@ import { HeaderComponent } from "./main/layout/header/header.component";
 import { FooterComponent } from "./main/layout/footer/footer.component";
 
 import { HomePageComponent } from "./main/pages/home/home-page.component";
+import { NewSearchPageComponent } from "./main/pages/new-search/new-search-page.component";
 import { NotFoundPageComponent } from "./main/pages/not-found/not-found-page.component";
 
 export class AppComponent extends React.Component {
@@ -48,10 +51,13 @@ export class AppComponent extends React.Component {
         <HeaderComponent />
         <Switch>
           <Route path="/" exact>
-            <Redirect to="/home" />
+            <Redirect to={`/${urlFragments.home}`} />
           </Route>
-          <Route path="/home">
+          <Route path={`/${urlFragments.home}`}>
             <HomePageComponent />
+          </Route>
+          <Route path={`/${urlFragments.newSearch}`}>
+            <NewSearchPageComponent />
           </Route>
           <Route path="*">
             <NotFoundPageComponent />

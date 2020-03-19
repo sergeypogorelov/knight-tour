@@ -1,16 +1,19 @@
+import { urlFragments } from "../../../constants/url-fragments";
+import { labels } from "../../../constants/labels";
+
 import { PrimaryNavigationItemProps } from "./primary-navigation-item/primary-navigation-item-props.interface";
 
 export const primaryNavigationItems: PrimaryNavigationItemProps[] = [
   {
-    href: "/home",
-    label: "Home"
+    href: `/${urlFragments.home}`,
+    label: labels.home
   },
   {
-    href: "/new-search",
-    label: "New Search"
+    href: `/${urlFragments.newSearch}`,
+    label: labels.newSearch
   },
   {
-    href: "/current-search",
-    label: "Current Search"
+    href: `/${urlFragments.currentSearch}`,
+    label: labels.currentSearch
   }
 ];
