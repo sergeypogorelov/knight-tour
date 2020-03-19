@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export const HomePageComponent = () => (
-  <div className="container">
+  <div className="container mt-2">
     <div className="jumbotron">
       <h1 className="display-4">Knight's Tour</h1>
       <p className="lead">

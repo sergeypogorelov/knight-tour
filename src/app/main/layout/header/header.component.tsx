@@ -6,7 +6,7 @@ import { PrimaryNavigationComponent } from "./primary-navigation/primary-navigat
 export class HeaderComponent extends React.Component {
   render() {
     return (
-      <div className="navbar navbar-light mb-2 bg-light">
+      <div className="navbar navbar-light bg-light">
         <LogoComponent />
         <PrimaryNavigationComponent />
       </div>
