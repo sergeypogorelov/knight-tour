@@ -2,15 +2,15 @@ import { PrimaryNavigationItemProps } from "./primary-navigation-item/primary-na
 
 export const primaryNavigationItems: PrimaryNavigationItemProps[] = [
   {
-    href: "home",
+    href: "/home",
     label: "Home"
   },
   {
-    href: "new-search",
+    href: "/new-search",
     label: "New Search"
   },
   {
-    href: "current-search",
+    href: "/current-search",
     label: "Current Search"
   }
 ];

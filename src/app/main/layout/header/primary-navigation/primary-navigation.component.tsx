@@ -8,11 +8,7 @@ export class PrimaryNavigationComponent extends React.Component {
     return (
       <div className="nav nav-pills">
         {primaryNavigationItems.map(props => (
-          <PrimaryNavigationItemComponent
-            key={props.href}
-            href={props.href}
-            label={props.label}
-          />
+          <PrimaryNavigationItemComponent key={props.href} {...props} />
         ))}
       </div>
     );

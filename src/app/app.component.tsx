@@ -1,4 +1,10 @@
 import * as React from "react";
+import {
+  HashRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from "react-router-dom";
 
 import BruteForceWorker from "worker-loader!./workers/brute-force";
 
@@ -9,6 +15,7 @@ import { HeaderComponent } from "./main/layout/header/header.component";
 import { FooterComponent } from "./main/layout/footer/footer.component";
 
 import { HomePageComponent } from "./main/pages/home/home-page.component";
+import { NotFoundPageComponent } from "./main/pages/not-found/not-found-page.component";
 
 export class AppComponent extends React.Component {
   // componentDidMount() {
@@ -37,11 +44,21 @@ export class AppComponent extends React.Component {
 
   render() {
     return (
-      <div className="wrapper">
+      <Router>
         <HeaderComponent />
-        <HomePageComponent />
+        <Switch>
+          <Route path="/" exact>
+            <Redirect to="/home" />
+          </Route>
+          <Route path="/home">
+            <HomePageComponent />
+          </Route>
+          <Route path="*">
+            <NotFoundPageComponent />
+          </Route>
+        </Switch>
         <FooterComponent />
-      </div>
+      </Router>
     );
   }
 }
