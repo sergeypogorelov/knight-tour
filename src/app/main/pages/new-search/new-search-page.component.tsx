@@ -7,12 +7,24 @@ import { BreadcrumbProps } from "../../shared/breadcrumb/breadcrumb-props.interf
 import { NewSearchPageState } from "./new-search-page-state.interface";
 
 import { BreadcrumbComponent } from "../../shared/breadcrumb/breadcrumb.component";
+import { Board } from "../../shared/board/board.component";
+import { IBoard } from "../../../common/interfaces/board.interface";
 
-export class NewSearchPageComponent extends React.Component {
+export class NewSearchPageComponent extends React.Component<
+  object,
+  NewSearchPageState
+> {
   state: NewSearchPageState = {
     breadcrumb: {
-      items: []
-    }
+      items: [],
+    },
+    board: {
+      cells: [
+        [-1, -1, -1],
+        [-1, 0, -1],
+        [-1, -1, -1],
+      ],
+    },
   };
 
   componentDidMount() {
@@ -60,6 +72,12 @@ export class NewSearchPageComponent extends React.Component {
                 </select>
               </div>
             </div>
+            <div className="form-row">
+              <div className="form-group col">
+                <label>First move</label>
+                <Board value={this.state.board} onChange={this.handleChange} />
+              </div>
+            </div>
             <button className="btn btn-primary" type="submit">
               Search
             </button>
@@ -69,25 +87,34 @@ export class NewSearchPageComponent extends React.Component {
     );
   }
 
+  handleChange = (board: IBoard) => {
+    const newState: NewSearchPageState = {
+      ...this.state,
+      board,
+    };
+
+    this.setState(newState);
+  };
+
   private setBreadcrumb() {
     const partialState: { breadcrumb: BreadcrumbProps } = {
       breadcrumb: {
         items: [
           {
             to: `/${urlFragments.home}`,
-            label: labels.home
+            label: labels.home,
           },
           {
             to: `/${urlFragments.newSearch}`,
-            label: labels.newSearch
-          }
-        ]
-      }
+            label: labels.newSearch,
+          },
+        ],
+      },
     };
 
     const state: NewSearchPageState = {
       ...this.state,
-      ...partialState
+      ...partialState,
     };
 
     this.setState(state);

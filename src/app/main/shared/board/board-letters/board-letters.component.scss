@@ -1,0 +1,10 @@
+@import "../../../../../styles/variables";
+
+.board-cell-letters {
+  .board-cell-letter {
+    width: $board-cell-size;
+    text-align: center;
+  }
+  display: flex;
+  padding-left: $board-panel-indent;
+}
