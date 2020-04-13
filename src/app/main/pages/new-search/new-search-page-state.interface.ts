@@ -3,5 +3,4 @@ import { BreadcrumbProps } from "../../shared/breadcrumb/breadcrumb-props.interf
 
 export interface NewSearchPageState {
   breadcrumb: BreadcrumbProps;
-  board: IBoard;
 }
