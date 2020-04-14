@@ -3,7 +3,7 @@ import {
   HashRouter as Router,
   Switch,
   Route,
-  Redirect
+  Redirect,
 } from "react-router-dom";
 
 import BruteForceWorker from "worker-loader!./workers/brute-force";
@@ -18,6 +18,7 @@ import { FooterComponent } from "./main/layout/footer/footer.component";
 
 import { HomePageComponent } from "./main/pages/home/home-page.component";
 import { NewSearchPageComponent } from "./main/pages/new-search/new-search-page.component";
+import { CurrentSearchPage } from "./main/pages/current-search/current-search-page.component";
 import { NotFoundPageComponent } from "./main/pages/not-found/not-found-page.component";
 
 export class AppComponent extends React.Component {
@@ -58,6 +59,9 @@ export class AppComponent extends React.Component {
           </Route>
           <Route path={`/${urlFragments.newSearch}`}>
             <NewSearchPageComponent />
+          </Route>
+          <Route path={`/${urlFragments.currentSearch}`}>
+            <CurrentSearchPage />
           </Route>
           <Route path="*">
             <NotFoundPageComponent />
