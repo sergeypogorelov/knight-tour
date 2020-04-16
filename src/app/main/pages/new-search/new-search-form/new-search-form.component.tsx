@@ -5,6 +5,8 @@ import { NewSearchFormProps } from "./new-search-form-props.interface";
 import { NewSearchFormState } from "./new-search-form-state.interface";
 import { NewSearchFormResult } from "./new-search-form-result.interface";
 
+import { Algorithms } from "../../../../common/enums/algorithms.enum";
+
 import { Board as BoardEntity } from "../../../../common/entities/board.class";
 
 import { Board } from "../../../shared/board/board.component";
@@ -95,19 +97,11 @@ export class NewSearchForm extends React.Component<
   handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
-    const {
-      countOfRows,
-      countOfColumns,
-      maxCountOfThreads,
-      algorithm,
-      firstMoveBoard,
-    } = this.state;
+    const { maxCountOfThreads, algorithm, firstMoveBoard } = this.state;
 
     const result: NewSearchFormResult = {
-      countOfRows: Number(countOfRows),
-      countOfColumns: Number(countOfColumns),
       maxCountOfThreads: Number(maxCountOfThreads),
-      algorithm,
+      algorithm: algorithm as Algorithms,
       firstMoveBoard,
     };
 
@@ -151,7 +145,7 @@ export class NewSearchForm extends React.Component<
       countOfRows: String(countOfRows),
       countOfColumns: String(countOfColumns),
       maxCountOfThreads: "1",
-      algorithm: "Brute Force",
+      algorithm: "Brute Force", /// TODO: replace hardcoded strings with enum
       firstMoveBoard,
     };
   }

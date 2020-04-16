@@ -1,9 +1,8 @@
 import { IBoard } from "../../../../common/interfaces/board.interface";
+import { Algorithms } from "../../../../common/enums/algorithms.enum";
 
 export interface NewSearchFormResult {
-  countOfRows: number;
-  countOfColumns: number;
   maxCountOfThreads: number;
-  algorithm: string;
+  algorithm: Algorithms;
   firstMoveBoard: IBoard;
 }

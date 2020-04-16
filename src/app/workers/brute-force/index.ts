@@ -23,22 +23,22 @@ let tag: string;
  */
 const searchWorkersWrapper = new SearchWorkersWrapper();
 
-searchWorkersWrapper.notification.subscribe(message => {
+searchWorkersWrapper.notification.subscribe((message) => {
   ctx.postMessage(message);
 });
 
-searchWorkersWrapper.searchStops.subscribe(ev => {
+searchWorkersWrapper.searchStops.subscribe((ev) => {
   const { countOfMoves } = ev;
   const message: ISearchStoppedMessage = {
     tag,
     countOfMoves,
-    type: Notifications.SearchStopped
+    type: Notifications.SearchStopped,
   };
 
   ctx.postMessage(message);
 });
 
-ctx.addEventListener("message", message => {
+ctx.addEventListener("message", (message) => {
   const messageData = message.data as IActionMessage;
 
   tag = messageData.tag;
@@ -70,7 +70,8 @@ ctx.addEventListener("message", message => {
 
     const message: ISearchStartedMessage = {
       tag,
-      type: Notifications.SearchStarted
+      board: actionMessage.board,
+      type: Notifications.SearchStarted,
     };
 
     ctx.postMessage(message);
@@ -86,11 +87,11 @@ ctx.addEventListener("message", message => {
   }
 });
 
-ctx.addEventListener("error", error => {
+ctx.addEventListener("error", (error) => {
   const errorMessage: ISearchErrorMessage = {
     tag: tag,
     type: Notifications.SearchError,
-    message: error.message
+    message: error.message,
   };
 
   ctx.postMessage(errorMessage);

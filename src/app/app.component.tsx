@@ -6,12 +6,10 @@ import {
   Redirect,
 } from "react-router-dom";
 
-import BruteForceWorker from "worker-loader!./workers/brute-force";
-
 import { urlFragments } from "./main/constants/url-fragments";
 
-import { Actions } from "./common/enums/actions.enum";
-import { IStartSearchMessage } from "./common/interfaces/messages/actions/start-search-message.interface";
+import { IFullSearchInfo } from "./common/interfaces/full-search-info.interface";
+import { AppState } from "./app-state.interface";
 
 import { HeaderComponent } from "./main/layout/header/header.component";
 import { FooterComponent } from "./main/layout/footer/footer.component";
@@ -21,30 +19,10 @@ import { NewSearchPageComponent } from "./main/pages/new-search/new-search-page.
 import { CurrentSearchPage } from "./main/pages/current-search/current-search-page.component";
 import { NotFoundPageComponent } from "./main/pages/not-found/not-found-page.component";
 
-export class AppComponent extends React.Component {
-  // componentDidMount() {
-  //   const worker = new BruteForceWorker();
-
-  //   worker.onmessage = ev => console.log(ev);
-  //   worker.onerror = ev => console.error(ev);
-
-  //   const message: IStartSearchMessage = {
-  //     type: Actions.SearchStart,
-  //     tag: "main",
-  //     board: {
-  //       cells: [
-  //         [-1, -1, -1, -1, -1],
-  //         [-1, -1, -1, -1, -1],
-  //         [-1, -1, 0, -1, -1],
-  //         [-1, -1, -1, -1, -1],
-  //         [-1, -1, -1, -1, -1]
-  //       ]
-  //     },
-  //     maxThreadCount: 2
-  //   };
-
-  //   worker.postMessage(message);
-  // }
+export class AppComponent extends React.Component<any, AppState> {
+  state: AppState = {
+    fullSearchInfo: null,
+  };
 
   render() {
     return (
@@ -58,10 +36,12 @@ export class AppComponent extends React.Component {
             <HomePageComponent />
           </Route>
           <Route path={`/${urlFragments.newSearch}`}>
-            <NewSearchPageComponent />
+            <NewSearchPageComponent
+              setFullSearchInfo={this.setFullSearchInfo}
+            />
           </Route>
           <Route path={`/${urlFragments.currentSearch}`}>
-            <CurrentSearchPage />
+            <CurrentSearchPage fullSearchInfo={this.state.fullSearchInfo} />
           </Route>
           <Route path="*">
             <NotFoundPageComponent />
@@ -71,4 +51,19 @@ export class AppComponent extends React.Component {
       </Router>
     );
   }
+
+  setFullSearchInfo = (info: IFullSearchInfo) => {
+    const { algorithm, firstMoveBoard, maxCountOfThreads } = info;
+
+    const newState: AppState = {
+      ...this.state,
+      fullSearchInfo: {
+        firstMoveBoard,
+        algorithm,
+        maxCountOfThreads,
+      },
+    };
+
+    this.setState(newState);
+  };
 }

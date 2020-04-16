@@ -1,9 +1,11 @@
 import * as React from "react";
+import { Redirect } from "react-router-dom";
 
 import { urlFragments } from "../../constants/url-fragments";
 import { labels } from "../../constants/labels";
 
 import { BreadcrumbProps } from "../../shared/breadcrumb/breadcrumb-props.interface";
+import { NewSearchPageProps } from "./new-search-page-props.interface";
 import { NewSearchPageState } from "./new-search-page-state.interface";
 import { NewSearchFormResult } from "./new-search-form/new-search-form-result.interface";
 
@@ -11,10 +13,11 @@ import { BreadcrumbComponent } from "../../shared/breadcrumb/breadcrumb.componen
 import { NewSearchForm } from "./new-search-form/new-search-form.component";
 
 export class NewSearchPageComponent extends React.Component<
-  object,
+  NewSearchPageProps,
   NewSearchPageState
 > {
   state: NewSearchPageState = {
+    redirect: false,
     breadcrumb: {
       items: [],
     },
@@ -25,6 +28,10 @@ export class NewSearchPageComponent extends React.Component<
   }
 
   render() {
+    if (this.state.redirect) {
+      return <Redirect to={urlFragments.currentSearch} />;
+    }
+
     return (
       <div>
         <BreadcrumbComponent items={this.state.breadcrumb.items} />
@@ -37,7 +44,20 @@ export class NewSearchPageComponent extends React.Component<
   }
 
   handleFormSubmit = (result: NewSearchFormResult) => {
-    console.log(result);
+    const { firstMoveBoard, algorithm, maxCountOfThreads } = result;
+
+    this.props.setFullSearchInfo({
+      firstMoveBoard,
+      algorithm,
+      maxCountOfThreads,
+    });
+
+    const newState: NewSearchPageState = {
+      ...this.state,
+      redirect: true,
+    };
+
+    this.setState(newState);
   };
 
   private setBreadcrumb() {
