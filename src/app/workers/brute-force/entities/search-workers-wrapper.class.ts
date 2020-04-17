@@ -8,11 +8,11 @@ import { IBoard } from "../../../common/interfaces/board.interface";
 import { INotificationMessage } from "../../../common/interfaces/messages/notifications/notification-message.interface";
 import { IStartSearchMessage } from "../../../common/interfaces/messages/actions/start-search-message.interface";
 import { ISearchStoppedMessage } from "../../../common/interfaces/messages/notifications/search-stopped.interface";
+import { SearchWorkersWrapperStop } from "../interfaces/search-workers-wrapper-stop.interface";
 
 import { Knight } from "../../../common/entities/knight.class";
 import { Board } from "../../../common/entities/board.class";
 import { NotificationsHandler } from "./notifications-handler.class";
-import { SearchWorkersWrapperStop } from "../interfaces/search-workers-wrapper-stop.interface";
 
 /**
  * wraper for search workers

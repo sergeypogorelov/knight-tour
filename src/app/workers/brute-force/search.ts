@@ -16,34 +16,43 @@ const ctx: Worker = self as any;
 
 let tag: string;
 
-ctx.addEventListener('message', message => {
-    const messageData = message.data as IActionMessage;
+ctx.addEventListener("message", (message) => {
+  const messageData = message.data as IActionMessage;
 
-    tag = messageData.tag;
+  tag = messageData.tag;
 
-    if (messageData.type === Actions.SearchStart) {
-        const actionMessage = messageData as IStartSearchMessage;
-        const knightTour = new KnightTour(Board.createFromJSON(actionMessage.board));
-        
-        const { searchStarts, searchProgressReportDone, searchResultFound, searchStops } = knightTour.notifications;
+  if (messageData.type === Actions.SearchStart) {
+    const actionMessage = messageData as IStartSearchMessage;
+    const knightTour = new KnightTour(
+      Board.createFromJSON(actionMessage.board)
+    );
 
-        (new Observable<INotificationMessage>())
-            .pipe(merge(searchStarts))
-            .pipe(merge(searchProgressReportDone))
-            .pipe(merge(searchResultFound))
-            .pipe(merge(searchStops))
-            .subscribe(message => ctx.postMessage(message));
+    const {
+      searchStarts,
+      searchProgressReportDone,
+      searchResultFound,
+      searchStops,
+    } = knightTour.notifications;
 
-        knightTour.search(actionMessage.tag);
-    }
+    new Observable<INotificationMessage>()
+      .pipe(merge(searchStarts))
+      .pipe(merge(searchProgressReportDone))
+      .pipe(merge(searchResultFound))
+      .pipe(merge(searchStops))
+      .subscribe((message) => {
+        ctx.postMessage(message);
+      });
+
+    knightTour.search(actionMessage.tag);
+  }
 });
 
-ctx.addEventListener('error', error => {
-    const errorMessage: ISearchErrorMessage = {
-        tag: tag,
-        type: Notifications.SearchError,
-        message: error.message
-    };
-    
-    ctx.postMessage(errorMessage);
+ctx.addEventListener("error", (error) => {
+  const errorMessage: ISearchErrorMessage = {
+    tag: tag,
+    type: Notifications.SearchError,
+    message: error.message,
+  };
+
+  ctx.postMessage(errorMessage);
 });
