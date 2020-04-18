@@ -27,6 +27,9 @@ import { Algorithms } from "../../../common/enums/algorithms.enum";
 import { SearchInfoProps } from "./search-info/search-info-props.interface";
 import { ISearchStoppedMessage } from "../../../common/interfaces/messages/notifications/search-stopped.interface";
 import { ISearchResultMessage } from "../../../common/interfaces/messages/notifications/search-result.interface";
+import { IPrepareMainSearchMessage } from "../../../common/interfaces/main-messages/actions/prepare-main-search-message.interface";
+import { MainActions } from "../../../common/enums/main-actions.enum";
+import { IStartMainSearchMessage } from "../../../common/interfaces/main-messages/actions/start-main-search-message.interface";
 
 const MAIN_WORKER_TAG = "main";
 
@@ -41,22 +44,37 @@ export class CurrentSearchPage extends React.Component<
     searchInfo: {
       solutionsFound: 0,
       movesTaken: 0,
-      algorithm: Algorithms.bruteForce,
+      algorithm: Algorithms.BruteForce,
     },
     boardInfoItems: [],
   };
 
   private _mainWorker: BruteForceWorker;
 
-  private _totalSolutionsFound: number;
-  private _totalMovesTaken: number;
-
-  private _solutionsFoundPerThread: IBoard[][];
-  private _movesTakenPerThread: number[];
-
   componentDidMount() {
     this.setBreadcrumb();
-    this.startSearch();
+
+    const mainWorker = new BruteForceWorker();
+
+    mainWorker.onmessage = (ev) => console.log(ev.data);
+    // mainWorker.onerror = (err) => console.error(err);
+
+    const prepareMessage: IPrepareMainSearchMessage = {
+      type: MainActions.SearchPrepare,
+      board: this.props.fullSearchInfo.firstMoveBoard,
+      countOfThreads: this.props.fullSearchInfo.maxCountOfThreads,
+    };
+
+    mainWorker.postMessage(prepareMessage);
+
+    setTimeout(() => {
+      const startMessage: IStartMainSearchMessage = {
+        type: MainActions.SearchStart,
+        reportInterval: 20,
+      };
+
+      mainWorker.postMessage(startMessage);
+    });
   }
 
   componentWillUnmount() {
@@ -116,226 +134,5 @@ export class CurrentSearchPage extends React.Component<
     };
 
     this.setState(state);
-  }
-
-  private startSearch() {
-    if (!this.props.fullSearchInfo) {
-      return;
-    }
-
-    this.prepareSearch();
-
-    this._mainWorker = new BruteForceWorker();
-
-    this._mainWorker.onmessage = (ev) => {
-      const data = ev.data as INotificationMessage;
-
-      // console.log(data);
-
-      if (data.tag === MAIN_WORKER_TAG) {
-        return;
-      }
-
-      if (data.type === Notifications.SearchStarted) {
-        this.handleSearchStarted(data as ISearchStartedMessage);
-      } else if (data.type === Notifications.SearchProgress) {
-        this.handleSearchProgress(data as ISearchProgressMessage);
-      } else if (data.type === Notifications.SearchResult) {
-        this.handleSearchResult(data as ISearchResultMessage);
-      } else if (data.type === Notifications.SearchStopped) {
-        this.handleSearchStopped(data as ISearchStoppedMessage);
-      }
-    };
-
-    this._mainWorker.onerror = (ev) => console.error(ev);
-
-    const message: IStartSearchMessage = {
-      type: Actions.SearchStart,
-      tag: MAIN_WORKER_TAG,
-      board: this.props.fullSearchInfo.firstMoveBoard,
-      maxThreadCount: this.props.fullSearchInfo.maxCountOfThreads,
-    };
-
-    this._mainWorker.postMessage(message);
-  }
-
-  private handleSearchStarted(data: ISearchStartedMessage) {
-    const fullData = data as ISearchStartedMessage;
-
-    const threadIndex = +fullData.tag - 1;
-
-    if (!this._solutionsFoundPerThread[threadIndex]) {
-      this._solutionsFoundPerThread[threadIndex] = [];
-    }
-
-    if (!this._movesTakenPerThread[threadIndex]) {
-      this._movesTakenPerThread[threadIndex] = 0;
-    }
-
-    const boardInfoItem = this.state.boardInfoItems[threadIndex] || null;
-
-    let boardInfoItems: BoardInfoProps[];
-    if (boardInfoItem) {
-      boardInfoItems = this.state.boardInfoItems.map((i) => {
-        if (i !== boardInfoItem) {
-          return i;
-        }
-
-        return {
-          ...i,
-          board: fullData.board,
-        };
-      });
-    } else {
-      boardInfoItems = [...this.state.boardInfoItems];
-
-      boardInfoItems[threadIndex] = {
-        solutionsFound: this._solutionsFoundPerThread[threadIndex].length,
-        movesTaken: this._movesTakenPerThread[threadIndex],
-        board: fullData.board,
-      };
-    }
-
-    const newState: CurrentSearchPageState = {
-      ...this.state,
-      boardInfoItems,
-    };
-
-    this.setState(newState);
-  }
-
-  private handleSearchProgress(data: ISearchProgressMessage) {
-    const fullData = data as ISearchProgressMessage;
-
-    const threadIndex = +fullData.tag - 1;
-    const newBoardInfoItems = this.state.boardInfoItems.map((item, index) => {
-      if (index !== threadIndex) {
-        return item;
-      }
-
-      return {
-        ...item,
-        movesTaken:
-          this._movesTakenPerThread[threadIndex] + fullData.movesTaken,
-      };
-    });
-
-    const newState: CurrentSearchPageState = {
-      ...this.state,
-      boardInfoItems: newBoardInfoItems,
-    };
-
-    this.setState(newState);
-    this.setSearchInfoState();
-  }
-
-  private handleSearchResult(data: ISearchResultMessage) {
-    const fullData = data as ISearchResultMessage;
-
-    const threadIndex = +fullData.tag - 1;
-
-    this._solutionsFoundPerThread[threadIndex].push(data.board);
-
-    const newBoardInfoItems = this.state.boardInfoItems.map((item, index) => {
-      if (index !== threadIndex) {
-        return item;
-      }
-
-      return {
-        ...item,
-        solutionsFound: this._solutionsFoundPerThread[threadIndex].length,
-      };
-    });
-
-    const newState: CurrentSearchPageState = {
-      ...this.state,
-      boardInfoItems: newBoardInfoItems,
-    };
-
-    this.setState(newState);
-    this.setSearchInfoState();
-  }
-
-  private handleSearchStopped(data: ISearchStoppedMessage) {
-    const fullData = data as ISearchStoppedMessage;
-
-    const threadIndex = +fullData.tag - 1;
-
-    this._movesTakenPerThread[threadIndex] += fullData.countOfMoves;
-
-    const newBoardInfoItems = this.state.boardInfoItems.map((item, index) => {
-      if (index !== threadIndex) {
-        return item;
-      }
-
-      return {
-        ...item,
-        movesTaken: this._movesTakenPerThread[threadIndex],
-      };
-    });
-
-    const newState: CurrentSearchPageState = {
-      ...this.state,
-      boardInfoItems: newBoardInfoItems,
-    };
-
-    this.setState(newState);
-    this.setSearchInfoState();
-  }
-
-  private prepareSearch() {
-    this.resetSearchState();
-
-    if (this._mainWorker) {
-      this._mainWorker.terminate();
-      this._mainWorker = null;
-    }
-
-    this._totalSolutionsFound = 0;
-    this._totalMovesTaken = 0;
-
-    this._solutionsFoundPerThread = [];
-    this._movesTakenPerThread = [];
-  }
-
-  private resetSearchState() {
-    const searchState: Partial<CurrentSearchPageState> = {
-      searchInfo: {
-        solutionsFound: 0,
-        movesTaken: 0,
-        algorithm: Algorithms.bruteForce,
-      },
-      boardInfoItems: [],
-    };
-
-    const newState: CurrentSearchPageState = {
-      ...this.state,
-      ...searchState,
-    };
-
-    this.setState(newState);
-  }
-
-  private setSearchInfoState() {
-    let solutionsFound = 0;
-    let movesTaken = 0;
-
-    this.state.boardInfoItems.forEach((i) => {
-      solutionsFound += i.solutionsFound;
-      movesTaken += i.movesTaken;
-    });
-
-    const searchInfo: SearchInfoProps = {
-      solutionsFound,
-      movesTaken,
-      algorithm: this.state.searchInfo.algorithm,
-    };
-
-    const newState: CurrentSearchPageState = {
-      ...this.state,
-      searchInfo,
-    };
-
-    this.setState(newState);
   }
 }

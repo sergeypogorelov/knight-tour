@@ -1,3 +1,3 @@
 export enum Algorithms {
-  bruteForce = "Brute Force",
+  BruteForce = "Brute Force",
 }
