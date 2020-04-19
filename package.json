@@ -9,6 +9,8 @@
     "build": "webpack --config webpack/webpack.config.dev.js",
     "prebuild:prod": "npm run clean:dist",
     "build:prod": "webpack --config webpack/webpack.config.prod.js",
+    "predeploy": "npm run build:prod",
+    "deploy": "gh-pages -d dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
