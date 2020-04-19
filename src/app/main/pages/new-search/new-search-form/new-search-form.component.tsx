@@ -7,7 +7,10 @@ import { NewSearchFormResult } from "./new-search-form-result.interface";
 
 import { Algorithms } from "../../../../common/enums/algorithms.enum";
 
-import { Board as BoardEntity } from "../../../../common/entities/board.class";
+import {
+  Board as BoardEntity,
+  CELL_VALUE_UNTOUCHED,
+} from "../../../../common/entities/board.class";
 
 import { Board } from "../../../shared/board/board.component";
 
@@ -87,7 +90,11 @@ export class NewSearchForm extends React.Component<
             />
           </div>
         </div>
-        <button className="btn btn-primary" type="submit">
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={this.state.submitButtonDisabled}
+        >
           Search
         </button>
       </form>
@@ -127,8 +134,13 @@ export class NewSearchForm extends React.Component<
   };
 
   handleBoardChange = (board: IBoard) => {
+    const boardNotValid =
+      Math.max(...board.cells.map((rows) => Math.max(...rows))) ===
+      CELL_VALUE_UNTOUCHED;
+
     const newState: NewSearchFormState = {
       ...this.state,
+      submitButtonDisabled: boardNotValid,
       firstMoveBoard: board,
     };
 
@@ -142,10 +154,11 @@ export class NewSearchForm extends React.Component<
     const firstMoveBoard = this.generateEmptyBoard(countOfRows, countOfColumns);
 
     return {
+      submitButtonDisabled: true,
       countOfRows: String(countOfRows),
       countOfColumns: String(countOfColumns),
-      maxCountOfThreads: "1",
-      algorithm: "Brute Force", /// TODO: replace hardcoded strings with enum
+      maxCountOfThreads: String(1),
+      algorithm: Algorithms.BruteForce,
       firstMoveBoard,
     };
   }
