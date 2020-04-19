@@ -9,10 +9,10 @@ import { NewSearchPageProps } from "./new-search-page-props.interface";
 import { NewSearchPageState } from "./new-search-page-state.interface";
 import { NewSearchFormResult } from "./new-search-form/new-search-form-result.interface";
 
-import { BreadcrumbComponent } from "../../shared/breadcrumb/breadcrumb.component";
+import { Breadcrumb } from "../../shared/breadcrumb/breadcrumb.component";
 import { NewSearchForm } from "./new-search-form/new-search-form.component";
 
-export class NewSearchPageComponent extends React.Component<
+export class NewSearchPage extends React.Component<
   NewSearchPageProps,
   NewSearchPageState
 > {
@@ -34,7 +34,7 @@ export class NewSearchPageComponent extends React.Component<
 
     return (
       <div>
-        <BreadcrumbComponent items={this.state.breadcrumb.items} />
+        <Breadcrumb items={this.state.breadcrumb.items} />
         <div className="container">
           <h2>New Search</h2>
           <NewSearchForm onSubmit={this.handleFormSubmit} />

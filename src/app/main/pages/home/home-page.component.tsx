@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export const HomePageComponent = () => (
+export const HomePage = () => (
   <div className="container mt-2">
     <div className="jumbotron">
       <h1 className="display-4">Knight's Tour</h1>

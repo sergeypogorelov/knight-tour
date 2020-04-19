@@ -1,14 +1,14 @@
 import * as React from "react";
 
-import { LogoComponent } from "./logo/logo-component";
-import { PrimaryNavigationComponent } from "./primary-navigation/primary-navigation.component";
+import { Logo } from "./logo/logo-component";
+import { PrimaryNavigation } from "./primary-navigation/primary-navigation.component";
 
-export class HeaderComponent extends React.Component {
+export class Header extends React.Component {
   render() {
     return (
       <div className="navbar navbar-light bg-light">
-        <LogoComponent />
-        <PrimaryNavigationComponent />
+        <Logo />
+        <PrimaryNavigation />
       </div>
     );
   }

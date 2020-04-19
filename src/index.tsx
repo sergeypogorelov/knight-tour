@@ -4,6 +4,6 @@ import "./index.scss";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { AppComponent } from "./app/app.component";
+import { App } from "./app/app.component";
 
-ReactDOM.render(<AppComponent />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));

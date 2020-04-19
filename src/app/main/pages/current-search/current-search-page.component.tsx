@@ -6,10 +6,6 @@ import BruteForceWorker from "worker-loader!../../../workers/brute-force";
 import { urlFragments } from "../../constants/url-fragments";
 import { labels } from "../../constants/labels";
 
-import { BreadcrumbProps } from "../../shared/breadcrumb/breadcrumb-props.interface";
-import { CurrentSearchPageProps } from "./current-search-page-props.interface";
-import { CurrentSearchPageState } from "./current-search-page-state.interface";
-
 import { Algorithms } from "../../../common/enums/algorithms.enum";
 import { MainActions } from "../../../common/enums/main-actions.enum";
 import { MainNotifications } from "../../../common/enums/main-notifications.enum";
@@ -26,12 +22,16 @@ import { IMainSearchStartedMessage } from "../../../common/interfaces/main-messa
 import { IMainSearchReportMessage } from "../../../common/interfaces/main-messages/notifications/main-search-report-message.interface";
 import { IMainSearchStoppedMessage } from "../../../common/interfaces/main-messages/notifications/main-search-stopped-message.interface";
 
+import { BreadcrumbProps } from "../../shared/breadcrumb/breadcrumb-props.interface";
 import { BoardInfoProps } from "./board-info/board-info-props.interface";
 import { SearchInfoProps } from "./search-info/search-info-props.interface";
+import { CurrentSearchPageProps } from "./current-search-page-props.interface";
+import { CurrentSearchPageState } from "./current-search-page-state.interface";
 
-import { BreadcrumbComponent } from "../../shared/breadcrumb/breadcrumb.component";
+import { Breadcrumb } from "../../shared/breadcrumb/breadcrumb.component";
 import { SearchInfo } from "./search-info/search-info.component";
 import { BoardInfo } from "./board-info/board-info.component";
+import { SolutionModal } from "./solution-modal/solution-modal.component";
 
 const REPORT_INTERVAL = 50;
 
@@ -80,7 +80,7 @@ export class CurrentSearchPage extends React.Component<
 
     return (
       <div>
-        <BreadcrumbComponent items={this.state.breadcrumb.items} />
+        <Breadcrumb items={this.state.breadcrumb.items} />
         <div className="container">
           <h2>Current Search</h2>
           <SearchInfo {...this.state.searchInfo} />
@@ -115,6 +115,10 @@ export class CurrentSearchPage extends React.Component<
             ))}
           </div>
         </div>
+        <SolutionModal
+          solution={this.state.solutionInModal}
+          onClose={this.handleSolutionModalClose}
+        />
       </div>
     );
   }
@@ -132,7 +136,21 @@ export class CurrentSearchPage extends React.Component<
   };
 
   handleShowSolutionButtonClick = () => {
-    console.log(this._solutionsPerThread);
+    const newState: CurrentSearchPageState = {
+      ...this.state,
+      solutionInModal: this._solutionsPerThread[0][0],
+    };
+
+    this.setState(newState);
+  };
+
+  handleSolutionModalClose = () => {
+    const newState: CurrentSearchPageState = {
+      ...this.state,
+      solutionInModal: null,
+    };
+
+    this.setState(newState);
   };
 
   private setBreadcrumb() {
@@ -252,6 +270,8 @@ export class CurrentSearchPage extends React.Component<
   }
 
   private searchStoppedHandler(data: IMainSearchStoppedMessage) {
+    this._mainWorker.terminate();
+
     if (data.lastReport) {
       this.searchReportHandler(data.lastReport);
     }

@@ -11,15 +11,15 @@ import { urlFragments } from "./main/constants/url-fragments";
 import { IFullSearchInfo } from "./common/interfaces/full-search-info.interface";
 import { AppState } from "./app-state.interface";
 
-import { HeaderComponent } from "./main/layout/header/header.component";
-import { FooterComponent } from "./main/layout/footer/footer.component";
+import { Header } from "./main/layout/header/header.component";
+import { Footer } from "./main/layout/footer/footer.component";
 
-import { HomePageComponent } from "./main/pages/home/home-page.component";
-import { NewSearchPageComponent } from "./main/pages/new-search/new-search-page.component";
+import { HomePage } from "./main/pages/home/home-page.component";
+import { NewSearchPage } from "./main/pages/new-search/new-search-page.component";
 import { CurrentSearchPage } from "./main/pages/current-search/current-search-page.component";
-import { NotFoundPageComponent } from "./main/pages/not-found/not-found-page.component";
+import { NotFoundPage } from "./main/pages/not-found/not-found-page.component";
 
-export class AppComponent extends React.Component<any, AppState> {
+export class App extends React.Component<any, AppState> {
   state: AppState = {
     fullSearchInfo: null,
   };
@@ -27,27 +27,25 @@ export class AppComponent extends React.Component<any, AppState> {
   render() {
     return (
       <Router>
-        <HeaderComponent />
+        <Header />
         <Switch>
           <Route path="/" exact>
             <Redirect to={`/${urlFragments.home}`} />
           </Route>
           <Route path={`/${urlFragments.home}`}>
-            <HomePageComponent />
+            <HomePage />
           </Route>
           <Route path={`/${urlFragments.newSearch}`}>
-            <NewSearchPageComponent
-              setFullSearchInfo={this.setFullSearchInfo}
-            />
+            <NewSearchPage setFullSearchInfo={this.setFullSearchInfo} />
           </Route>
           <Route path={`/${urlFragments.currentSearch}`}>
             <CurrentSearchPage fullSearchInfo={this.state.fullSearchInfo} />
           </Route>
           <Route path="*">
-            <NotFoundPageComponent />
+            <NotFoundPage />
           </Route>
         </Switch>
-        <FooterComponent />
+        <Footer />
       </Router>
     );
   }
