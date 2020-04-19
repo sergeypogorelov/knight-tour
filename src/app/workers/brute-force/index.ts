@@ -1,24 +1,30 @@
 import BruteForceWorker from "worker-loader!./search";
 
-import { IMainActionMessage } from "../../common/interfaces/main-messages/actions/main-action-message.interface";
+import { MainNotifications } from "../../common/enums/main-notifications.enum";
 import { MainActions } from "../../common/enums/main-actions.enum";
+import { Notifications } from "../../common/enums/notifications.enum";
+import { Actions } from "../../common/enums/actions.enum";
+
+import { IBoard } from "../../common/interfaces/board.interface";
+
+import { IMainActionMessage } from "../../common/interfaces/main-messages/actions/main-action-message.interface";
 import { IPrepareMainSearchMessage } from "../../common/interfaces/main-messages/actions/prepare-main-search-message.interface";
 import { IStartMainSearchMessage } from "../../common/interfaces/main-messages/actions/start-main-search-message.interface";
 import { IStopMainSearchMessage } from "../../common/interfaces/main-messages/actions/stop-main-search-message.interface";
-import { Knight } from "../../common/entities/knight.class";
-import { Board } from "../../common/entities/board.class";
 import { IMainSearchPreparedMessage } from "../../common/interfaces/main-messages/notifications/main-search-prepared-message.interface";
-import { MainNotifications } from "../../common/enums/main-notifications.enum";
-import { IBoard } from "../../common/interfaces/board.interface";
+import { IMainSearchStartedMessage } from "../../common/interfaces/main-messages/notifications/main-search-started-message.interface";
+import { IMainSearchReportMessage } from "../../common/interfaces/main-messages/notifications/main-search-report-message.interface";
+import { IMainSearchStoppedMessage } from "../../common/interfaces/main-messages/notifications/main-search-stopped-message.interface";
+
 import { IStartSearchMessage } from "../../common/interfaces/messages/actions/start-search-message.interface";
-import { Actions } from "../../common/enums/actions.enum";
 import { INotificationMessage } from "../../common/interfaces/messages/notifications/notification-message.interface";
-import { Notifications } from "../../common/enums/notifications.enum";
+import { ISearchStartedMessage } from "../../common/interfaces/messages/notifications/search-started.interface";
 import { ISearchProgressMessage } from "../../common/interfaces/messages/notifications/search-progress.interface";
 import { ISearchResultMessage } from "../../common/interfaces/messages/notifications/search-result.interface";
 import { ISearchStoppedMessage } from "../../common/interfaces/messages/notifications/search-stopped.interface";
-import { IMainSearchReportMessage } from "../../common/interfaces/main-messages/notifications/main-search-report-message.interface";
-import { ISearchStartedMessage } from "../../common/interfaces/messages/notifications/search-started.interface";
+
+import { Knight } from "../../common/entities/knight.class";
+import { Board } from "../../common/entities/board.class";
 
 interface ISearchStatus {
   movesTakenPerThread: number[];
@@ -29,17 +35,19 @@ interface ISearchStatus {
 
 const ctx: Worker = self as any;
 
+let searchPrepared: boolean;
+let searchInProgress: boolean;
 let searchCompleted: boolean;
 
-let boardsToSolve: Board[];
-let solutionsPerThread: IBoard[][];
-
-let workers: Worker[];
-let workersActive: boolean[];
+let intervalId: NodeJS.Timer;
 
 let searchStatus: ISearchStatus;
 
-let intervalId: NodeJS.Timer;
+let boardsToSolve: Board[];
+let newSolutionsFoundPerThread: IBoard[][];
+
+let workers: Worker[];
+let workersActive: boolean[];
 
 ctx.onmessage = (ev) => {
   const evData = ev.data as IMainActionMessage;
@@ -60,19 +68,17 @@ ctx.onmessage = (ev) => {
 ctx.onerror = (error) => console.error(error);
 
 function mainSearchPrepareHandler(data: IPrepareMainSearchMessage) {
-  if (workers) {
-    throw new Error("Workers have been already initilized.");
+  if (searchInProgress) {
+    throw new Error("The search is already in progress.");
   }
 
   const knight = new Knight(Board.createFromJSON(data.board));
   boardsToSolve = generateBoardsToSolve(knight, data.countOfThreads);
 
-  searchCompleted = false;
-
   workers = [];
   workersActive = [];
 
-  solutionsPerThread = [];
+  newSolutionsFoundPerThread = [];
 
   searchStatus = {
     movesTakenPerThread: [],
@@ -100,9 +106,43 @@ function mainSearchPrepareHandler(data: IPrepareMainSearchMessage) {
   };
 
   ctx.postMessage(message);
+
+  searchPrepared = true;
+  searchCompleted = false;
 }
 
 function mainSearchStartHandler(data: IStartMainSearchMessage) {
+  if (!searchPrepared) {
+    throw new Error("The search should be prepared first.");
+  }
+
+  if (searchInProgress) {
+    throw new Error("The search is already in progress.");
+  }
+
+  runWorkers();
+  runInterval(data.reportInterval);
+
+  const message: IMainSearchStartedMessage = {
+    type: MainNotifications.SearchStarted,
+  };
+
+  ctx.postMessage(message);
+
+  searchInProgress = true;
+}
+
+function mainSearchStopHandler(data: IStopMainSearchMessage) {
+  if (!searchInProgress) {
+    throw new Error("The search is not in progress.");
+  }
+
+  searchPrepared = false;
+  searchInProgress = false;
+  searchCompleted = true;
+}
+
+function runWorkers() {
   workers.forEach((worker, index) => {
     worker.onmessage = (ev) => {
       const evData = ev.data as INotificationMessage;
@@ -135,43 +175,6 @@ function mainSearchStartHandler(data: IStartMainSearchMessage) {
     worker.postMessage(message);
     workersActive[index] = true;
   });
-
-  intervalId = setInterval(() => {
-    let totalSolutionsFound = 0;
-    let totalMovesTaken = 0;
-
-    for (let i = 0; i < workers.length; i++) {
-      totalSolutionsFound += searchStatus.solutionsFoundPerThread[i].length;
-      totalMovesTaken += searchStatus.movesTakenWithProgressPerThread[i];
-    }
-
-    const message: IMainSearchReportMessage = {
-      type: MainNotifications.SearchReport,
-      totalSolutionsFound,
-      totalMovesTaken,
-      newSolutionsFoundPerThread: solutionsPerThread,
-      solutionsFoundCountPerThread: searchStatus.solutionsFoundPerThread.map(
-        (i) => i.length
-      ),
-      movesTakenCountPerThread: searchStatus.movesTakenWithProgressPerThread,
-      boardsPerThread: searchStatus.boardsSolvingPerThread,
-    };
-
-    solutionsPerThread = [];
-    for (let i = 0; i < workers.length; i++) {
-      solutionsPerThread[i] = [];
-    }
-
-    ctx.postMessage(message);
-
-    if (searchCompleted) {
-      clearInterval(intervalId);
-    }
-  }, data.reportInterval);
-}
-
-function mainSearchStopHandler(data: IStopMainSearchMessage) {
-  workers.forEach((i) => i.terminate());
 }
 
 function searchStartedHandler(data: ISearchStartedMessage) {
@@ -191,7 +194,7 @@ function searchResultHandler(data: ISearchResultMessage) {
   const index = +data.tag;
   searchStatus.solutionsFoundPerThread[index].push(data.board);
 
-  solutionsPerThread[index].push(data.board);
+  newSolutionsFoundPerThread[index].push(data.board);
 }
 
 function searchStoppedHandler(data: ISearchStoppedMessage) {
@@ -216,6 +219,52 @@ function searchStoppedHandler(data: ISearchStoppedMessage) {
       searchCompleted = true;
     }
   }
+}
+
+function runInterval(reportInterval: number) {
+  intervalId = setInterval(() => {
+    let totalSolutionsFound = 0;
+    let totalMovesTaken = 0;
+
+    for (let i = 0; i < workers.length; i++) {
+      totalSolutionsFound += searchStatus.solutionsFoundPerThread[i].length;
+      totalMovesTaken += searchStatus.movesTakenWithProgressPerThread[i];
+    }
+
+    const solutionsFoundCountPerThread = searchStatus.solutionsFoundPerThread.map(
+      (i) => i.length
+    );
+
+    const reportMessage: IMainSearchReportMessage = {
+      type: MainNotifications.SearchReport,
+      totalSolutionsFound,
+      totalMovesTaken,
+      newSolutionsFoundPerThread,
+      solutionsFoundCountPerThread,
+      movesTakenCountPerThread: searchStatus.movesTakenWithProgressPerThread,
+      boardsPerThread: searchStatus.boardsSolvingPerThread,
+    };
+
+    newSolutionsFoundPerThread = [];
+    for (let i = 0; i < workers.length; i++) {
+      newSolutionsFoundPerThread[i] = [];
+    }
+
+    if (searchCompleted) {
+      clearInterval(intervalId);
+
+      workers.forEach((i) => i.terminate());
+
+      const stopMessage: IMainSearchStoppedMessage = {
+        type: MainNotifications.SearchStopped,
+        lastReport: reportMessage,
+      };
+
+      ctx.postMessage(stopMessage);
+    } else {
+      ctx.postMessage(reportMessage);
+    }
+  }, reportInterval);
 }
 
 /**
