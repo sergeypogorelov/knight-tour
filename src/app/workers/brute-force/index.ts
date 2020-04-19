@@ -194,6 +194,10 @@ function searchResultHandler(data: ISearchResultMessage) {
   const index = +data.tag;
   searchStatus.solutionsFoundPerThread[index].push(data.board);
 
+  if (!newSolutionsFoundPerThread[index]) {
+    newSolutionsFoundPerThread[index] = [];
+  }
+
   newSolutionsFoundPerThread[index].push(data.board);
 }
 
@@ -246,9 +250,6 @@ function runInterval(reportInterval: number) {
     };
 
     newSolutionsFoundPerThread = [];
-    for (let i = 0; i < workers.length; i++) {
-      newSolutionsFoundPerThread[i] = [];
-    }
 
     if (searchCompleted) {
       clearInterval(intervalId);
