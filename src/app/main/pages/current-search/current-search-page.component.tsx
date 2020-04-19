@@ -13,9 +13,9 @@ import { CurrentSearchPageState } from "./current-search-page-state.interface";
 import { Algorithms } from "../../../common/enums/algorithms.enum";
 import { MainActions } from "../../../common/enums/main-actions.enum";
 import { MainNotifications } from "../../../common/enums/main-notifications.enum";
+import { BoardInfoStatuses } from "./board-info/board-info-statuses.enum";
 
-import { BoardInfoProps } from "./board-info/board-info-props.interface";
-import { SearchInfoProps } from "./search-info/search-info-props.interface";
+import { IBoard } from "../../../common/interfaces/board.interface";
 import { IPrepareMainSearchMessage } from "../../../common/interfaces/main-messages/actions/prepare-main-search-message.interface";
 import { IStartMainSearchMessage } from "../../../common/interfaces/main-messages/actions/start-main-search-message.interface";
 import { IStopMainSearchMessage } from "../../../common/interfaces/main-messages/actions/stop-main-search-message.interface";
@@ -25,6 +25,9 @@ import { IMainSearchPreparedMessage } from "../../../common/interfaces/main-mess
 import { IMainSearchStartedMessage } from "../../../common/interfaces/main-messages/notifications/main-search-started-message.interface";
 import { IMainSearchReportMessage } from "../../../common/interfaces/main-messages/notifications/main-search-report-message.interface";
 import { IMainSearchStoppedMessage } from "../../../common/interfaces/main-messages/notifications/main-search-stopped-message.interface";
+
+import { BoardInfoProps } from "./board-info/board-info-props.interface";
+import { SearchInfoProps } from "./search-info/search-info-props.interface";
 
 import { BreadcrumbComponent } from "../../shared/breadcrumb/breadcrumb.component";
 import { SearchInfo } from "./search-info/search-info.component";
@@ -53,6 +56,8 @@ export class CurrentSearchPage extends React.Component<
 
   private _mainWorker: BruteForceWorker;
 
+  private _solutionsPerThread: IBoard[][];
+
   componentDidMount() {
     this.setBreadcrumb();
     this.initMainWorker();
@@ -80,11 +85,8 @@ export class CurrentSearchPage extends React.Component<
           <h2>Current Search</h2>
           <SearchInfo {...this.state.searchInfo} />
           <div>
-            <button className="btn btn-primary" type="button">
-              Show Random Solution
-            </button>
             <button
-              className="btn btn-success ml-2"
+              className="btn btn-success"
               type="button"
               disabled={!this.state.prepared || this.state.started}
               onClick={this.handleStarthButtonClick}
@@ -98,6 +100,13 @@ export class CurrentSearchPage extends React.Component<
               onClick={this.handleStopButtonClick}
             >
               Stop
+            </button>
+            <button
+              className="btn btn-primary ml-2"
+              type="button"
+              onClick={this.handleShowSolutionButtonClick}
+            >
+              Show Random Solution
             </button>
           </div>
           <div className="d-flex flex-wrap justify-content-between mt-4">
@@ -120,6 +129,10 @@ export class CurrentSearchPage extends React.Component<
 
   handleStopButtonClick = () => {
     this.stopSearch();
+  };
+
+  handleShowSolutionButtonClick = () => {
+    console.log(this._solutionsPerThread);
   };
 
   private setBreadcrumb() {
@@ -172,6 +185,7 @@ export class CurrentSearchPage extends React.Component<
   private searchPreparedHandler(data: IMainSearchPreparedMessage) {
     const boardInfoItems = data.boardsPerThread.map((board) => {
       const result: BoardInfoProps = {
+        status: BoardInfoStatuses.Waiting,
         solutionsFound: 0,
         movesTaken: 0,
         board,
@@ -199,6 +213,14 @@ export class CurrentSearchPage extends React.Component<
   }
 
   private searchReportHandler(data: IMainSearchReportMessage) {
+    data.newSolutionsFoundPerThread.forEach((boards, index) => {
+      if (!this._solutionsPerThread[index]) {
+        this._solutionsPerThread[index] = [];
+      }
+
+      this._solutionsPerThread[index].push(...boards);
+    });
+
     const searchInfo: SearchInfoProps = {
       solutionsFound: data.totalSolutionsFound,
       movesTaken: data.totalMovesTaken,
@@ -206,10 +228,15 @@ export class CurrentSearchPage extends React.Component<
     };
 
     const boardInfoItems = data.boardsPerThread.map((board, index) => {
+      const status = data.boardsActivePerThread[index]
+        ? BoardInfoStatuses.InProgress
+        : BoardInfoStatuses.Completed;
+
       const result: BoardInfoProps = {
         solutionsFound: data.solutionsFoundCountPerThread[index],
         movesTaken: data.movesTakenCountPerThread[index],
         board,
+        status,
       };
 
       return result;
@@ -238,6 +265,8 @@ export class CurrentSearchPage extends React.Component<
   }
 
   private prepareSearch() {
+    this._solutionsPerThread = [];
+
     const message: IPrepareMainSearchMessage = {
       type: MainActions.SearchPrepare,
       board: this.props.fullSearchInfo.firstMoveBoard,

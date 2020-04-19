@@ -247,6 +247,7 @@ function runInterval(reportInterval: number) {
       solutionsFoundCountPerThread,
       movesTakenCountPerThread: searchStatus.movesTakenWithProgressPerThread,
       boardsPerThread: searchStatus.boardsSolvingPerThread,
+      boardsActivePerThread: workersActive,
     };
 
     newSolutionsFoundPerThread = [];

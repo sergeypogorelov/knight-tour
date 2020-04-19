@@ -11,7 +11,7 @@ export const BoardInfo = (props: BoardInfoProps) => {
         <Board value={props.board} readonly />
       </div>
       <div className="card-body">
-        <h5 className="card-title mb-1">In Progress</h5>
+        <h5 className="card-title mb-1">{props.status}</h5>
         <div className="card-text mb-3">
           <p className="mb-0">Solutions found: {props.solutionsFound}</p>
           <p className="mb-0">Moves taken: {props.movesTaken}</p>
