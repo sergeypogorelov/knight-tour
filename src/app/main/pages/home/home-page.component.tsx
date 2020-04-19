@@ -1,4 +1,7 @@
 import * as React from "react";
+import { NavLink } from "react-router-dom";
+
+import { urlFragments } from "../../constants/url-fragments";
 
 export const HomePage = () => (
   <div className="container mt-2">
@@ -21,9 +24,12 @@ export const HomePage = () => (
         This application requires WEB Workers support. If your browser doesn't
         support it, the application is not going to work.
       </p>
-      <a className="btn btn-primary btn-lg" href="#" role="button">
+      <NavLink
+        className="btn btn-primary btn-lg"
+        to={`/${urlFragments.newSearch}`}
+      >
         Get Started
-      </a>
+      </NavLink>
     </div>
   </div>
 );

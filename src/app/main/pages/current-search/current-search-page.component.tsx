@@ -28,6 +28,8 @@ import { SearchInfoProps } from "./search-info/search-info-props.interface";
 import { CurrentSearchPageProps } from "./current-search-page-props.interface";
 import { CurrentSearchPageState } from "./current-search-page-state.interface";
 
+import { RandHelper } from "../../../common/helpers/rand-helper.class";
+
 import { Breadcrumb } from "../../shared/breadcrumb/breadcrumb.component";
 import { SearchInfo } from "./search-info/search-info.component";
 import { BoardInfo } from "./board-info/board-info.component";
@@ -136,12 +138,7 @@ export class CurrentSearchPage extends React.Component<
   };
 
   handleShowSolutionButtonClick = () => {
-    const newState: CurrentSearchPageState = {
-      ...this.state,
-      solutionInModal: this._solutionsPerThread[0][0],
-    };
-
-    this.setState(newState);
+    this.setRandomSolutionForModal();
   };
 
   handleSolutionModalClose = () => {
@@ -311,5 +308,34 @@ export class CurrentSearchPage extends React.Component<
     };
 
     this._mainWorker.postMessage(message);
+  }
+
+  private setRandomSolutionForModal() {
+    if (this._solutionsPerThread.length === 0) {
+      return;
+    }
+
+    const randThreadIndex = RandHelper.getRandomInteger(
+      0,
+      this._solutionsPerThread.length - 1
+    );
+
+    if (this._solutionsPerThread[randThreadIndex].length === 0) {
+      return;
+    }
+
+    const randSolutionIndex = RandHelper.getRandomInteger(
+      0,
+      this._solutionsPerThread[randThreadIndex].length - 1
+    );
+
+    const newState: CurrentSearchPageState = {
+      ...this.state,
+      solutionInModal: this._solutionsPerThread[randThreadIndex][
+        randSolutionIndex
+      ],
+    };
+
+    this.setState(newState);
   }
 }
